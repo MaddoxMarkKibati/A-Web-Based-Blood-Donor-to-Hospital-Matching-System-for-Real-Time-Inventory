@@ -57,3 +57,31 @@ class BloodRequestDetailView(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         return BloodRequest.objects.filter(staff=self.request.user.staff_profile)
+    
+from django.db import transaction
+from django.utils import timezone
+
+from accounts.permissions import IsKNBTSAdmin
+from donors.models import Donation
+from donors.serializers import DonationSerializer
+
+
+class RecordDonationView(generics.CreateAPIView):
+    serializer_class = DonationSerializer
+    permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        donation = serializer.save()
+
+        donor = donation.donor
+        donor.last_donation_date = timezone.now()
+        donor.save(update_fields=["last_donation_date"])
+
+        inventory, _ = BloodInventory.objects.get_or_create(
+            regional_storage_center=donation.regional_storage_center,
+            blood_type=donation.blood_type,
+            defaults={"units_available": 0},
+        )
+        inventory.units_available += donation.units_donated
+        inventory.save(update_fields=["units_available", "updated_at"])

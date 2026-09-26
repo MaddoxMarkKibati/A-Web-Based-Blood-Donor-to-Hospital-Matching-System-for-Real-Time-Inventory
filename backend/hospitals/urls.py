@@ -7,6 +7,7 @@ from .views import (
     BloodInventoryUpdateView,
     BloodRequestListCreateView,
     BloodRequestDetailView,
+    RecordDonationView,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("inventory/<int:pk>/", BloodInventoryUpdateView.as_view(), name="inventory-detail"),
     path("requests/", BloodRequestListCreateView.as_view(), name="request-list-create"),
     path("requests/<int:pk>/", BloodRequestDetailView.as_view(), name="request-detail"),
+        path("donations/", RecordDonationView.as_view(), name="record-donation"),
 ]
