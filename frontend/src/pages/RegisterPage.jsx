@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { registerUser } from "../api/auth";
 
-export default function LoginPage() {
-  const { login } = useAuth();
+export default function RegisterPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("donor");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -15,10 +15,10 @@ export default function LoginPage() {
     setError("");
     setSubmitting(true);
     try {
-      await login({ email, password });
-      navigate("/");
+      await registerUser({ email, password, role });
+      navigate("/login");
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Registration failed");
     } finally {
       setSubmitting(false);
     }
@@ -27,7 +27,7 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <form onSubmit={handleSubmit} className="auth-form">
-        <h1>Log In</h1>
+        <h1>Register</h1>
 
         {error && <p className="auth-error">{error}</p>}
 
@@ -46,15 +46,22 @@ export default function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          minLength={8}
           required
         />
 
+        <label htmlFor="role">I am a</label>
+        <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="donor">Blood Donor</option>
+          <option value="hospital_staff">Hospital Staff</option>
+        </select>
+
         <button type="submit" disabled={submitting}>
-          {submitting ? "Logging in..." : "Log In"}
+          {submitting ? "Registering..." : "Register"}
         </button>
 
         <p>
-          No account? <Link to="/register">Register</Link>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </form>
     </div>
