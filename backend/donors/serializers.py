@@ -27,7 +27,7 @@ class DonationSerializer(serializers.ModelSerializer):
             "regional_storage_center_name", "blood_type", "units_donated",
             "donation_date",
         ]
-        read_only_fields = ["id", "donor", "donation_date"]
+        read_only_fields = ["id", "donation_date"]
 
 
 class NotificationSerializer(serializers.ModelSerializer):
