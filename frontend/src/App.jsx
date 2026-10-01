@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import DonorDashboard from "./pages/DonorDashboard";
+import HospitalDashboard from "./pages/HospitalDashboard";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -15,6 +16,7 @@ function PrivateRoute({ children }) {
 function RoleDashboard() {
   const { user } = useAuth();
   if (user.role === "donor") return <DonorDashboard />;
+  if (user.role === "hospital_staff") return <HospitalDashboard />;
   return <p>Dashboard for role "{user.role}" is not built yet.</p>;
 }
 
