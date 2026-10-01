@@ -3,12 +3,19 @@ import { useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
+import DonorDashboard from "./pages/DonorDashboard";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <p>Loading...</p>;
   if (!user) return <Navigate to="/login" replace />;
   return children;
+}
+
+function RoleDashboard() {
+  const { user } = useAuth();
+  if (user.role === "donor") return <DonorDashboard />;
+  return <p>Dashboard for role "{user.role}" is not built yet.</p>;
 }
 
 function App() {
@@ -21,7 +28,7 @@ function App() {
           path="/"
           element={
             <PrivateRoute>
-              <HomePage />
+              <RoleDashboard />
             </PrivateRoute>
           }
         />
