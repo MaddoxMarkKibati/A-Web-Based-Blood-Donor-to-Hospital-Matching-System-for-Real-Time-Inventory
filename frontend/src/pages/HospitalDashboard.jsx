@@ -153,7 +153,11 @@ export default function HospitalDashboard() {
         <ul>
           {requests.map((r) => (
             <li key={r.id}>
-              {r.blood_type} x{r.units_needed} — {r.urgency_level} — {r.status} — {r.regional_storage_center_name}
+              {r.blood_type} x{r.units_needed} —{" "}
+              <span className={`badge ${r.urgency_level === "critical" ? "badge-critical" : "badge-standard"}`}>
+                {r.urgency_level}
+              </span>{" "}
+              — {r.status} — {r.regional_storage_center_name}
             </li>
           ))}
         </ul>

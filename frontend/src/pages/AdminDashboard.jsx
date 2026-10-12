@@ -120,7 +120,10 @@ export default function AdminDashboard() {
         <ul>
           {filteredInventory.map((i) => (
             <li key={i.id}>
-              {i.regional_storage_center_name} — {i.blood_type}: {i.units_available} units
+              {i.regional_storage_center_name} — {i.blood_type}:{" "}
+              <span className={`badge ${i.units_available < 5 ? "badge-critical" : "badge-standard"}`}>
+                {i.units_available} units
+              </span>
             </li>
           ))}
         </ul>
