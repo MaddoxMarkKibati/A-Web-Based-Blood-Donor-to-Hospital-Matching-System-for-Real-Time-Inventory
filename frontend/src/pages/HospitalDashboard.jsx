@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import ThemeToggle from "../components/ThemeToggle";
 import {
   fetchMyStaffProfile,
   fetchRegionalStorageCenters,
@@ -73,7 +74,10 @@ export default function HospitalDashboard() {
       <header>
         <h1>Staff Dashboard — {profile.hospital_name || "No hospital assigned"}</h1>
         <p>Logged in as: {profile.name}</p>
-        <button onClick={logout}>Log Out</button>
+        <div className="header-actions">
+          <ThemeToggle />
+          <button onClick={logout}>Log Out</button>
+        </div>
       </header>
 
       {error && <p className="auth-error">{error}</p>}

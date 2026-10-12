@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import ThemeToggle from "../components/ThemeToggle";
 import {
   fetchMyProfile,
   updateMyProfile,
@@ -53,7 +54,10 @@ export default function DonorDashboard() {
     <div className="dashboard">
       <header>
         <h1>Donor Portal</h1>
-        <button onClick={logout}>Log Out</button>
+        <div className="header-actions">
+          <ThemeToggle />
+          <button onClick={logout}>Log Out</button>
+        </div>
       </header>
 
       {error && <p className="auth-error">{error}</p>}
