@@ -10,23 +10,34 @@ class Donor(models.Model):
         ("O+", "O+"), ("O-", "O-"),
     ]
 
+    GENDER_CHOICES = [
+        ("M", "Male"),
+        ("F", "Female"),
+    ]
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="donor_profile",
     )
     name = models.CharField(max_length=150)
-    blood_type = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES)
+    blood_type = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     location = models.PointField(geography=True, srid=4326, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     last_donation_date = models.DateTimeField(null=True, blank=True)
 
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
+    weight_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    height_cm = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    national_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
     class Meta:
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} ({self.blood_type})"
+        return f"{self.name} ({self.blood_type or 'unset'})"
     
 class Donation(models.Model):
     donor = models.ForeignKey(
