@@ -4,15 +4,24 @@ from .models import Donor, Donation, Notification
 
 class DonorSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
-    location = GeometryField(required=False, allow_null=True)
 
     class Meta:
         model = Donor
         fields = [
             "id", "email", "name", "blood_type", "phone",
             "location", "is_verified", "last_donation_date",
+            "date_of_birth", "gender", "weight_kg", "height_cm", "national_id",
         ]
         read_only_fields = ["id", "is_verified", "last_donation_date"]
+
+    def validate_blood_type(self, value):
+        instance = self.instance
+        if instance and instance.blood_type and value != instance.blood_type:
+            raise serializers.ValidationError(
+                "Blood type cannot be changed once set. Contact a hospital staff "
+                "member or KNBTS admin to update it."
+            )
+        return value
         
 class DonationSerializer(serializers.ModelSerializer):
     donor_name = serializers.CharField(source="donor.name", read_only=True)
