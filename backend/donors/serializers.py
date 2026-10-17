@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField
-from .models import Donor, Donation, Notification
+from .models import Donor, DonorLocation, Donation, Notification
 
 class DonorSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
@@ -9,7 +9,7 @@ class DonorSerializer(serializers.ModelSerializer):
         model = Donor
         fields = [
             "id", "email", "name", "blood_type", "phone",
-            "location", "is_verified", "last_donation_date",
+            "is_verified", "last_donation_date",
             "date_of_birth", "gender", "weight_kg", "height_cm", "national_id",
         ]
         read_only_fields = ["id", "is_verified", "last_donation_date"]
@@ -23,6 +23,33 @@ class DonorSerializer(serializers.ModelSerializer):
             )
         return value
         
+class DonorLocationSerializer(serializers.ModelSerializer):
+    point = GeometryField()
+
+    class Meta:
+        model = DonorLocation
+        fields = ["id", "label", "point", "location_type", "created_at", "updated_at"]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate(self, data):
+        donor = self.context["request"].user.donor_profile
+        location_type = data.get("location_type", getattr(self.instance, "location_type", None))
+
+        existing = donor.locations.filter(location_type=location_type)
+        if self.instance:
+            existing = existing.exclude(pk=self.instance.pk)
+
+        if location_type == DonorLocation.LocationType.FREQUENT:
+            limit = DonorLocation.MAX_FREQUENT
+        else:
+            limit = DonorLocation.MAX_LIVE
+
+        if existing.count() >= limit:
+            raise serializers.ValidationError(
+                f"You already have the maximum of {limit} '{location_type}' location(s)."
+            )
+        return data
+
 class DonationSerializer(serializers.ModelSerializer):
     donor_name = serializers.CharField(source="donor.name", read_only=True)
     regional_storage_center_name = serializers.CharField(
