@@ -85,3 +85,23 @@ class RecordDonationView(generics.CreateAPIView):
         )
         inventory.units_available += donation.units_donated
         inventory.save(update_fields=["units_available", "updated_at"])
+        
+from accounts.permissions import IsHospitalStaffOrKNBTSAdmin
+from donors.models import Donor
+from donors.serializers import DonorSerializer
+
+
+class DonorBloodTypeOverrideView(generics.UpdateAPIView):
+    """Lets hospital staff or KNBTS admins correct a donor's blood_type,
+    bypassing the self-service lock in DonorSerializer."""
+
+    queryset = Donor.objects.all()
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaffOrKNBTSAdmin]
+
+    class _OverrideSerializer(DonorSerializer):
+        def validate_blood_type(self, value):
+            # Skip the lock entirely for this endpoint; staff/admin are
+            # explicitly allowed to correct blood_type at any time.
+            return value
+
+    serializer_class = _OverrideSerializer    

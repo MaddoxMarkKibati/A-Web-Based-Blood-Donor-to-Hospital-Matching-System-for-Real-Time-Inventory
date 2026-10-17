@@ -8,6 +8,7 @@ from .views import (
     BloodRequestListCreateView,
     BloodRequestDetailView,
     RecordDonationView,
+    DonorBloodTypeOverrideView,
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("requests/", BloodRequestListCreateView.as_view(), name="request-list-create"),
     path("requests/<int:pk>/", BloodRequestDetailView.as_view(), name="request-detail"),
         path("donations/", RecordDonationView.as_view(), name="record-donation"),
+    path("donors/<int:pk>/blood-type/", DonorBloodTypeOverrideView.as_view(), name="donor-blood-type-override"),
 ]
