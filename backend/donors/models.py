@@ -23,7 +23,6 @@ class Donor(models.Model):
     name = models.CharField(max_length=150)
     blood_type = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    location = models.PointField(geography=True, srid=4326, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     last_donation_date = models.DateTimeField(null=True, blank=True)
 
@@ -39,6 +38,35 @@ class Donor(models.Model):
     def __str__(self):
         return f"{self.name} ({self.blood_type or 'unset'})"
     
+class DonorLocation(models.Model):
+    class LocationType(models.TextChoices):
+        FREQUENT = "frequent", "Frequent"
+        LIVE = "live", "Live"
+
+    MAX_FREQUENT = 2
+    MAX_LIVE = 1
+
+    donor = models.ForeignKey(
+        Donor,
+        on_delete=models.CASCADE,
+        related_name="locations",
+    )
+    label = models.CharField(max_length=50)
+    point = models.PointField(geography=True, srid=4326)
+    location_type = models.CharField(
+        max_length=10,
+        choices=LocationType.choices,
+        default=LocationType.FREQUENT,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["location_type", "-created_at"]
+
+    def __str__(self):
+        return f"{self.donor} — {self.label} ({self.location_type})"
+
 class Donation(models.Model):
     donor = models.ForeignKey(
         Donor,
