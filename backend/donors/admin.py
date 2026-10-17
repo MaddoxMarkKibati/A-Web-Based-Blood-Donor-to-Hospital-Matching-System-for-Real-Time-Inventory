@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Donor, Donation, Notification
+from .models import Donor, DonorLocation, Donation, Notification
 
 
 @admin.register(Donor)
@@ -8,6 +8,12 @@ class DonorAdmin(admin.ModelAdmin):
     list_display = ("name", "blood_type", "phone", "is_verified", "last_donation_date")
     list_filter = ("blood_type", "is_verified")
     search_fields = ("name", "phone")
+    
+@admin.register(DonorLocation)
+class DonorLocationAdmin(admin.ModelAdmin):
+    list_display = ("donor", "label", "location_type", "updated_at")
+    list_filter = ("location_type",)
+    search_fields = ("label", "donor__name")
 
 
 @admin.register(Donation)
