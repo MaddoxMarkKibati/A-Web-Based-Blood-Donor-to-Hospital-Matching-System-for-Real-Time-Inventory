@@ -15,14 +15,19 @@ class RegisterView(generics.CreateAPIView):
     @transaction.atomic
     def perform_create(self, serializer):
         user = serializer.save()
+        names = {
+            "first_name": serializer.validated_data.get("first_name", ""),
+            "middle_names": serializer.validated_data.get("middle_names", ""),
+            "last_name": serializer.validated_data.get("last_name", ""),
+        }
 
         if user.role == User.Role.DONOR:
             from donors.models import Donor
-            Donor.objects.create(user=user)
+            Donor.objects.create(user=user, **names)
 
         elif user.role == User.Role.HOSPITAL_STAFF:
             from staff.models import Staff
-            Staff.objects.create(user=user, role="Staff")
+            Staff.objects.create(user=user, role="Staff", **names)
 
 
 class MeView(generics.RetrieveAPIView):
