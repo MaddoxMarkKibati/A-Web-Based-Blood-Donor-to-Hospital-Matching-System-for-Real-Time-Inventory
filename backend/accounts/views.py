@@ -18,11 +18,11 @@ class RegisterView(generics.CreateAPIView):
 
         if user.role == User.Role.DONOR:
             from donors.models import Donor
-            Donor.objects.create(user=user, name=user.email.split("@")[0])
+            Donor.objects.create(user=user)
 
         elif user.role == User.Role.HOSPITAL_STAFF:
             from staff.models import Staff
-            Staff.objects.create(user=user, name=user.email.split("@")[0], role="Staff")
+            Staff.objects.create(user=user, role="Staff")
 
 
 class MeView(generics.RetrieveAPIView):

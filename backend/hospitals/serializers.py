@@ -36,7 +36,7 @@ class BloodRequestSerializer(serializers.ModelSerializer):
     regional_storage_center_name = serializers.CharField(
         source="regional_storage_center.region_name", read_only=True
     )
-    staff_name = serializers.CharField(source="staff.name", read_only=True, default=None)
+    staff_name = serializers.CharField(source="staff.full_name", read_only=True, default=None)
 
     class Meta:
         model = BloodRequest

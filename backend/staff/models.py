@@ -8,7 +8,9 @@ class Staff(models.Model):
         on_delete=models.CASCADE,
         related_name="staff_profile",
     )
-    name = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=100, blank=True)
+    middle_names = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
     role = models.CharField(max_length=50)
     hospital = models.ForeignKey(
         "hospitals.Hospital",
@@ -25,8 +27,14 @@ class Staff(models.Model):
         related_name="staff_members",
     )
 
+    @property
+    def full_name(self):
+        parts = [self.first_name, self.middle_names, self.last_name]
+        return " ".join(p for p in parts if p).strip()
+    
     class Meta:
         verbose_name_plural = "staff"
+        ordering = ["last_name", "first_name"]
 
     def __str__(self):
-        return self.name
+        return self.full_name or self.user.email

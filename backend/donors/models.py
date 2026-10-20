@@ -20,7 +20,9 @@ class Donor(models.Model):
         on_delete=models.CASCADE,
         related_name="donor_profile",
     )
-    name = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=100, blank=True)
+    middle_names = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
     blood_type = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     is_verified = models.BooleanField(default=False)
@@ -32,11 +34,16 @@ class Donor(models.Model):
     height_cm = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     national_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
+    @property
+    def full_name(self):
+        parts = [self.first_name, self.middle_names, self.last_name]
+        return " ".join(p for p in parts if p).strip()
+    
     class Meta:
-        ordering = ["name"]
+        ordering = ["last_name", "first_name"]
 
     def __str__(self):
-        return f"{self.name} ({self.blood_type or 'unset'})"
+        return f"{self.full_name or self.user.email} ({self.blood_type or 'unset'})"
     
 class DonorLocation(models.Model):
     class LocationType(models.TextChoices):

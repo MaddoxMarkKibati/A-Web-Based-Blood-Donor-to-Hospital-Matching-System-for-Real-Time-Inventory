@@ -5,6 +5,7 @@ from .models import Staff
 
 class StaffSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
+    full_name = serializers.CharField(read_only=True)
     hospital_name = serializers.CharField(source="hospital.name", read_only=True, default=None)
     regional_storage_center_name = serializers.CharField(
         source="regional_storage_center.region_name", read_only=True, default=None
@@ -13,7 +14,7 @@ class StaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = Staff
         fields = [
-            "id", "email", "name", "role",
+            "id", "email", "first_name", "middle_names", "last_name", "full_name", "role",
             "hospital", "hospital_name",
             "regional_storage_center", "regional_storage_center_name",
         ]

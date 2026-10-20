@@ -4,11 +4,12 @@ from .models import Donor, DonorLocation, Donation, Notification
 
 class DonorSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
+    full_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = Donor
         fields = [
-            "id", "email", "name", "blood_type", "phone",
+            "id", "email", "first_name", "middle_names", "last_name", "full_name", "blood_type", "phone",
             "is_verified", "last_donation_date",
             "date_of_birth", "gender", "weight_kg", "height_cm", "national_id",
         ]
@@ -51,7 +52,7 @@ class DonorLocationSerializer(serializers.ModelSerializer):
         return data
 
 class DonationSerializer(serializers.ModelSerializer):
-    donor_name = serializers.CharField(source="donor.name", read_only=True)
+    donor_name = serializers.CharField(source="donor.full_name", read_only=True)
     regional_storage_center_name = serializers.CharField(
         source="regional_storage_center.region_name", read_only=True
     )
