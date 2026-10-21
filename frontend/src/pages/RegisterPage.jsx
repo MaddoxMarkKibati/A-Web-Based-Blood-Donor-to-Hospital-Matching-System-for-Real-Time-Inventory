@@ -9,13 +9,16 @@ export default function RegisterPage() {
   const [role, setRole] = useState("donor");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [middleNames, setMiddleNames] = useState("");
+  const [lastName, setLastName] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setSubmitting(true);
     try {
-      await registerUser({ email, password, role });
+      await registerUser({ email, password, role, first_name: firstName, middle_names: middleNames, last_name: lastName });
       navigate("/login");
     } catch (err) {
       setError(err.message || "Registration failed");
@@ -30,7 +33,29 @@ export default function RegisterPage() {
         <h1>Register</h1>
 
         {error && <p className="auth-error">{error}</p>}
+                <label htmlFor="first_name">First Name</label>
+        <input
+          id="first_name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
 
+        <label htmlFor="middle_names">Middle Name(s) (optional)</label>
+        <input
+          id="middle_names"
+          value={middleNames}
+          onChange={(e) => setMiddleNames(e.target.value)}
+        />
+
+        <label htmlFor="last_name">Last Name</label>
+        <input
+          id="last_name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
+        
         <label htmlFor="email">Email</label>
         <input
           id="email"

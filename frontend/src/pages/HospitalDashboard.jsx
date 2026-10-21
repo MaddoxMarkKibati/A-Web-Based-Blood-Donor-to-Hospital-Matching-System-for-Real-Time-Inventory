@@ -73,7 +73,7 @@ export default function HospitalDashboard() {
     <div className="dashboard">
       <header>
         <h1>Staff Dashboard — {profile.hospital_name || "No hospital assigned"}</h1>
-        <p>Logged in as: {profile.name}</p>
+        <p>Logged in as: {profile.full_name || "(name not set)"}</p>
         <div className="header-actions">
           <ThemeToggle />
           <button onClick={logout}>Log Out</button>

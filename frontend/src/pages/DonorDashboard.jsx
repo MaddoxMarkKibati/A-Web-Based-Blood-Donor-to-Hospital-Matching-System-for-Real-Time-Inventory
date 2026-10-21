@@ -64,7 +64,9 @@ export default function DonorDashboard() {
     setMessage("");
     try {
       const updated = await updateMyProfile({
-        name: profile.name,
+        first_name: profile.first_name,
+        middle_names: profile.middle_names,
+        last_name: profile.last_name,
         phone: profile.phone,
         blood_type: profile.blood_type,
         date_of_birth: profile.date_of_birth || null,
@@ -153,11 +155,25 @@ export default function DonorDashboard() {
       <section>
         <h2>My Profile</h2>
         <form onSubmit={handleSaveProfile} className="auth-form">
-          <label htmlFor="name">Full Name</label>
+          <label htmlFor="first_name">First Name</label>
           <input
-            id="name"
-            value={profile.name}
-            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+            id="first_name"
+            value={profile.first_name}
+            onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+          />
+
+          <label htmlFor="middle_names">Middle Name(s)</label>
+          <input
+            id="middle_names"
+            value={profile.middle_names}
+            onChange={(e) => setProfile({ ...profile, middle_names: e.target.value })}
+          />
+
+          <label htmlFor="last_name">Last Name</label>
+          <input
+            id="last_name"
+            value={profile.last_name}
+            onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
           />
 
           <label htmlFor="blood_type">
