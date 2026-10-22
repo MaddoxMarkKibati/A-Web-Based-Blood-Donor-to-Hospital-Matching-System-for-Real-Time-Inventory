@@ -23,6 +23,17 @@ class DonorSerializer(serializers.ModelSerializer):
                 "member or KNBTS admin to update it."
             )
         return value
+
+class DonorSummarySerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Donor
+        fields = [
+            "id", "full_name", "blood_type", "gender",
+            "national_id", "last_donation_date",
+        ]
+        read_only_fields = fields 
         
 class DonorLocationSerializer(serializers.ModelSerializer):
     point = GeometryField()

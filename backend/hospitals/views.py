@@ -1,12 +1,25 @@
-from rest_framework import generics, permissions
+from django.db import transaction
+from django.utils import timezone
+from rest_framework import filters, generics, permissions
 
-from accounts.permissions import IsHospitalStaff, IsHospitalStaffOrKNBTSAdmin, IsKNBTSAdmin
-from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest
+from accounts.permissions import (
+    IsHospitalStaff,
+    IsHospitalStaffOrKNBTSAdmin,
+    IsKNBTSAdmin,
+)
+from donors.models import Donor
+from donors.serializers import (
+    DonationSerializer,
+    DonorSerializer,
+    DonorSummarySerializer,
+)
+
+from .models import BloodInventory, BloodRequest, Hospital, RegionalStorageCenter
 from .serializers import (
-    HospitalSerializer,
-    RegionalStorageCenterSerializer,
     BloodInventorySerializer,
     BloodRequestSerializer,
+    HospitalSerializer,
+    RegionalStorageCenterSerializer,
 )
 
 
@@ -57,13 +70,6 @@ class BloodRequestDetailView(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         return BloodRequest.objects.filter(staff=self.request.user.staff_profile)
-    
-from django.db import transaction
-from django.utils import timezone
-
-from accounts.permissions import IsKNBTSAdmin
-from donors.models import Donation
-from donors.serializers import DonationSerializer
 
 
 class RecordDonationView(generics.CreateAPIView):
@@ -85,10 +91,6 @@ class RecordDonationView(generics.CreateAPIView):
         )
         inventory.units_available += donation.units_donated
         inventory.save(update_fields=["units_available", "updated_at"])
-        
-from accounts.permissions import IsHospitalStaffOrKNBTSAdmin
-from donors.models import Donor
-from donors.serializers import DonorSerializer
 
 
 class DonorBloodTypeOverrideView(generics.UpdateAPIView):
@@ -100,8 +102,25 @@ class DonorBloodTypeOverrideView(generics.UpdateAPIView):
 
     class _OverrideSerializer(DonorSerializer):
         def validate_blood_type(self, value):
-            # Skip the lock entirely for this endpoint; staff/admin are
-            # explicitly allowed to correct blood_type at any time.
+            # Staff and admins may correct blood_type at any time.
             return value
 
-    serializer_class = _OverrideSerializer    
+    serializer_class = _OverrideSerializer
+
+
+class DonorSearchView(generics.ListAPIView):
+    """Staff/admin search for donors by name or national ID."""
+
+    serializer_class = DonorSummarySerializer
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaffOrKNBTSAdmin]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["first_name", "middle_names", "last_name", "national_id"]
+
+    def get_queryset(self):
+        term = self.request.query_params.get("search", "").strip()
+        if len(term) < 2:
+            return Donor.objects.none()
+        return Donor.objects.all()
+
+    def filter_queryset(self, queryset):
+        return super().filter_queryset(queryset)[:20]
