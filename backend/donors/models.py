@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.db import models
-
+from datetime import timedelta
+from django.utils import timezone
 
 class Donor(models.Model):
     BLOOD_TYPE_CHOICES = [
@@ -14,6 +15,11 @@ class Donor(models.Model):
         ("M", "Male"),
         ("F", "Female"),
     ]
+    
+    MIN_AGE = 16
+    MAX_AGE = 65
+    MIN_WEIGHT_KG = 50
+    INTERVAL_DAYS = {"M": 90, "F": 120}
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -39,6 +45,54 @@ class Donor(models.Model):
         parts = [self.first_name, self.middle_names, self.last_name]
         return " ".join(p for p in parts if p).strip()
     
+    @property
+    def age(self):
+        if not self.date_of_birth:
+            return None
+        today = timezone.localdate()
+        had_birthday = (today.month, today.day) >= (
+            self.date_of_birth.month,
+            self.date_of_birth.day,
+        )
+        return today.year - self.date_of_birth.year - (0 if had_birthday else 1)
+
+    def eligibility_issues(self):
+        """Return a list of reasons this donor cannot be alerted or accept
+        right now. An empty list means the donor is eligible."""
+        issues = []
+
+        if not self.blood_type:
+            issues.append("Blood type is not set.")
+
+        if self.age is None:
+            issues.append("Date of birth is missing.")
+        elif not (self.MIN_AGE <= self.age <= self.MAX_AGE):
+            issues.append(
+                f"Age must be between {self.MIN_AGE} and {self.MAX_AGE}."
+            )
+
+        if not self.gender:
+            issues.append("Gender is missing.")
+
+        if self.weight_kg is None:
+            issues.append("Weight is missing.")
+        elif self.weight_kg < self.MIN_WEIGHT_KG:
+            issues.append(f"Weight must be at least {self.MIN_WEIGHT_KG} kg.")
+
+        if self.gender in self.INTERVAL_DAYS and self.last_donation_date:
+            next_date = self.last_donation_date + timedelta(
+                days=self.INTERVAL_DAYS[self.gender]
+            )
+            if timezone.now() < next_date:
+                issues.append(
+                    f"Next eligible donation date is {timezone.localtime(next_date):%d %b %Y}."
+                )
+
+        return issues
+
+    @property
+    def is_eligible(self):
+        return not self.eligibility_issues()
     class Meta:
         ordering = ["last_name", "first_name"]
 
@@ -121,6 +175,13 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ["-date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["donor", "blood_request"],
+                condition=models.Q(blood_request__isnull=False),
+                name="unique_alert_per_donor_per_request",
+            )
+        ]
 
     def __str__(self):
         return f"{self.donor} — {self.status}"
