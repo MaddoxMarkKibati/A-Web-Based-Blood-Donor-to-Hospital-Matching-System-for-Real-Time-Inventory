@@ -25,7 +25,9 @@ class MyNotificationsListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDonor]
 
     def get_queryset(self):
-        return Notification.objects.filter(donor=self.request.user.donor_profile)
+        return Notification.objects.filter(
+            donor=self.request.user.donor_profile
+        ).select_related("blood_request__regional_storage_center")
 
 
 class NotificationRespondView(generics.UpdateAPIView):
@@ -33,8 +35,9 @@ class NotificationRespondView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDonor]
 
     def get_queryset(self):
-        return Notification.objects.filter(donor=self.request.user.donor_profile)
-    
+        return Notification.objects.filter(
+            donor=self.request.user.donor_profile
+        ).select_related("donor", "blood_request__regional_storage_center")
 
 class MyLocationsListCreateView(generics.ListCreateAPIView):
     serializer_class = DonorLocationSerializer

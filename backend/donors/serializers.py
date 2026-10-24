@@ -79,7 +79,55 @@ class DonationSerializer(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
+    blood_type = serializers.CharField(
+        source="blood_request.blood_type", read_only=True, default=None
+    )
+    units_needed = serializers.IntegerField(
+        source="blood_request.units_needed", read_only=True, default=None
+    )
+    urgency_level = serializers.CharField(
+        source="blood_request.urgency_level", read_only=True, default=None
+    )
+    request_status = serializers.CharField(
+        source="blood_request.status", read_only=True, default=None
+    )
+    regional_storage_center_name = serializers.CharField(
+        source="blood_request.regional_storage_center.region_name",
+        read_only=True,
+        default=None,
+    )
+
     class Meta:
         model = Notification
-        fields = ["id", "donor", "blood_request", "date", "status", "message_type"]
+        fields = [
+            "id", "donor", "blood_request", "date", "status", "message_type",
+            "blood_type", "units_needed", "urgency_level", "request_status",
+            "regional_storage_center_name",
+        ]
         read_only_fields = ["id", "donor", "blood_request", "date", "message_type"]
+
+    def validate_status(self, value):
+        if value not in (Notification.Status.ACCEPTED, Notification.Status.DECLINED):
+            raise serializers.ValidationError("You can only accept or decline an alert.")
+
+        notification = self.instance
+        if notification is None:
+            return value
+
+        if notification.status != Notification.Status.PENDING:
+            raise serializers.ValidationError(
+                "This alert has already been answered or has expired."
+            )
+
+        blood_request = notification.blood_request
+        if blood_request and blood_request.status != blood_request.Status.PENDING:
+            raise serializers.ValidationError("This request is no longer open.")
+
+        if value == Notification.Status.ACCEPTED:
+            issues = notification.donor.eligibility_issues()
+            if issues:
+                raise serializers.ValidationError(
+                    ["You cannot accept this alert right now."] + issues
+                )
+
+        return value
