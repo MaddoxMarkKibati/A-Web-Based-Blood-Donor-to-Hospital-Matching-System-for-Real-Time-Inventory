@@ -275,3 +275,57 @@ label {
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
 }
+
+.donor-search {
+  position: relative;
+  display: inline-block;
+}
+
+.donor-search input {
+  min-width: 260px;
+}
+
+.donor-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin-top: 0.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.donor-results li {
+  padding: 0;
+}
+
+.donor-results button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.donor-results button:hover {
+  background: var(--color-surface-raised);
+}
+
+.donor-selected {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4em 0.8em;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-raised);
+}
+
+.dashboard .auth-form > .donor-search,
+.dashboard .auth-form > .donor-selected {
+  vertical-align: middle;
+}

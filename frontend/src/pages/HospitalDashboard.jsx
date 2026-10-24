@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import BloodTypeCorrection from "../components/BloodTypeCorrection";
 import ThemeToggle from "../components/ThemeToggle";
 import {
   fetchMyStaffProfile,
@@ -147,6 +148,7 @@ export default function HospitalDashboard() {
         </ul>
       </section>
 
+      <BloodTypeCorrection />
       <section>
         <h2>My Submitted Requests</h2>
         {requests.length === 0 && <p>No requests submitted yet.</p>}

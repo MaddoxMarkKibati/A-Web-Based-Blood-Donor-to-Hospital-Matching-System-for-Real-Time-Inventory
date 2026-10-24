@@ -32,3 +32,14 @@ export async function createRequest(data) {
     body: JSON.stringify(data),
   });
 }
+
+export async function searchDonors(term) {
+  return apiFetch(`/hospitals/donors/?search=${encodeURIComponent(term)}`);
+}
+
+export async function correctDonorBloodType(id, bloodType) {
+  return apiFetch(`/hospitals/donors/${id}/blood-type/`, {
+    method: "PATCH",
+    body: JSON.stringify({ blood_type: bloodType }),
+  });
+}

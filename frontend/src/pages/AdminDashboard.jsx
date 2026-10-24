@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
+import DonorSearch from "../components/DonorSearch";
+import BloodTypeCorrection from "../components/BloodTypeCorrection";
 import { fetchRegionalStorageCenters } from "../api/hospitals";
 import { fetchAllInventory, recordDonation } from "../api/admin";
 
@@ -13,6 +15,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedDonor, setSelectedDonor] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [filterBloodType, setFilterBloodType] = useState("");
@@ -41,11 +44,26 @@ export default function AdminDashboard() {
 
   useEffect(loadData, []);
 
+  function handleSelectDonor(donor) {
+    setSelectedDonor(donor);
+    setForm((f) => ({
+      ...f,
+      donor: donor ? donor.id : "",
+      blood_type: donor?.blood_type || f.blood_type,
+    }));
+  }
+  
   async function handleRecordDonation(e) {
+    if (!form.donor) {
+      setError("Select a donor first.");
+      return;
+    }
     e.preventDefault();
     setSubmitting(true);
     setError("");
     setMessage("");
+    setSelectedDonor(null);
+    setForm((f) => ({ ...f, donor: "", blood_type: "" }));
     try {
       const donation = await recordDonation({
         ...form,
@@ -132,14 +150,8 @@ export default function AdminDashboard() {
       <section>
         <h2>Record Donation</h2>
         <form onSubmit={handleRecordDonation} className="auth-form">
-          <label htmlFor="donor">Donor ID</label>
-          <input
-            id="donor"
-            type="number"
-            value={form.donor}
-            onChange={(e) => setForm({ ...form, donor: e.target.value })}
-            required
-          />
+          <label>Donor</label>
+          <DonorSearch selected={selectedDonor} onSelect={handleSelectDonor} />
 
           <label htmlFor="rsc">Regional Storage Center</label>
           <select
