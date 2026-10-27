@@ -131,3 +131,12 @@ class NotificationSerializer(serializers.ModelSerializer):
                 )
 
         return value
+    
+class RequestResponseSerializer(serializers.ModelSerializer):
+    donor_name = serializers.CharField(source="donor.full_name", read_only=True)
+    blood_type = serializers.CharField(source="donor.blood_type", read_only=True)
+
+    class Meta:
+        model = Notification
+        fields = ["id", "donor_name", "blood_type", "status"]
+        read_only_fields = fields

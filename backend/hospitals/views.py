@@ -1,17 +1,20 @@
 from django.db import transaction
 from django.utils import timezone
+from django.db.models import Case, IntegerField, Value, When
 from rest_framework import filters, generics, permissions
+from rest_framework.generics import get_object_or_404
 
 from accounts.permissions import (
     IsHospitalStaff,
     IsHospitalStaffOrKNBTSAdmin,
     IsKNBTSAdmin,
 )
-from donors.models import Donor
+from donors.models import Donor, Notification
 from donors.serializers import (
     DonationSerializer,
     DonorSerializer,
     DonorSummarySerializer,
+    RequestResponseSerializer,
 )
 
 from .models import BloodInventory, BloodRequest, Hospital, RegionalStorageCenter
@@ -124,3 +127,30 @@ class DonorSearchView(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         return super().filter_queryset(queryset)[:20]
+    
+class RequestResponsesView(generics.ListAPIView):
+    """Donors alerted for one of the logged-in staff member's blood requests,
+    with their response status."""
+
+    serializer_class = RequestResponseSerializer
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
+
+    def get_queryset(self):
+        blood_request = get_object_or_404(
+            BloodRequest,
+            pk=self.kwargs["pk"],
+            staff=self.request.user.staff_profile,
+        )
+        status_order = Case(
+            When(status=Notification.Status.ACCEPTED, then=Value(0)),
+            When(status=Notification.Status.PENDING, then=Value(1)),
+            When(status=Notification.Status.DECLINED, then=Value(2)),
+            default=Value(3),
+            output_field=IntegerField(),
+        )
+        return (
+            Notification.objects.filter(blood_request=blood_request)
+            .select_related("donor")
+            .annotate(status_order=status_order)
+            .order_by("status_order", "-date")
+        )
