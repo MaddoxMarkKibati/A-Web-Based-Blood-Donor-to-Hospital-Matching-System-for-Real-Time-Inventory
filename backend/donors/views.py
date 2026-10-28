@@ -1,9 +1,11 @@
+import logging
 from rest_framework import generics, permissions
 
 from accounts.permissions import IsDonor
 from .models import Donor, Donation, Notification
 from .serializers import DonorSerializer, DonorLocationSerializer, DonationSerializer, NotificationSerializer
-
+from hospitals.alerts import top_up_alerts
+logger = logging.getLogger(__name__)
 
 class MyDonorProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = DonorSerializer
@@ -38,6 +40,20 @@ class NotificationRespondView(generics.UpdateAPIView):
         return Notification.objects.filter(
             donor=self.request.user.donor_profile
         ).select_related("donor", "blood_request__regional_storage_center")
+        
+    def perform_update(self, serializer):
+        notification = serializer.save()
+        if (
+            notification.status == Notification.Status.DECLINED
+            and notification.blood_request_id
+        ):
+            try:
+                top_up_alerts(notification.blood_request_id)
+            except Exception:
+                # A matching failure must never block a donor's answer.
+                logger.exception(
+                    "Alert refill failed for request %s", notification.blood_request_id
+                )
 
 class MyLocationsListCreateView(generics.ListCreateAPIView):
     serializer_class = DonorLocationSerializer
