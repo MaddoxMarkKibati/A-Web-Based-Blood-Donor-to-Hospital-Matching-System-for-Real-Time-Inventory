@@ -43,3 +43,7 @@ export async function correctDonorBloodType(id, bloodType) {
     body: JSON.stringify({ blood_type: bloodType }),
   });
 }
+
+export async function fetchRequestResponses(requestId) {
+  return apiFetch(`/hospitals/requests/${requestId}/responses/`);
+}

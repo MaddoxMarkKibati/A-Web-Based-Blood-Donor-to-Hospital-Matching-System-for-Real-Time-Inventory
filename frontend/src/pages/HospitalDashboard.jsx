@@ -8,6 +8,7 @@ import {
   fetchInventory,
   fetchMyRequests,
   createRequest,
+  fetchRequestResponses,
 } from "../api/hospitals";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -21,6 +22,9 @@ export default function HospitalDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [openRequestId, setOpenRequestId] = useState(null);
+  const [responses, setResponses] = useState({});
+  const [loadingResponses, setLoadingResponses] = useState(false);
 
   const [form, setForm] = useState({
     regional_storage_center: "",
@@ -65,6 +69,24 @@ export default function HospitalDashboard() {
       setError(err.message);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function toggleResponses(id) {
+    if (openRequestId === id) {
+      setOpenRequestId(null);
+      return;
+    }
+    setOpenRequestId(id);
+    setLoadingResponses(true);
+    setError("");
+    try {
+      const data = await fetchRequestResponses(id);
+      setResponses((prev) => ({ ...prev, [id]: data }));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingResponses(false);
     }
   }
 
@@ -159,7 +181,25 @@ export default function HospitalDashboard() {
               <span className={`badge ${r.urgency_level === "critical" ? "badge-critical" : "badge-standard"}`}>
                 {r.urgency_level}
               </span>{" "}
-              — {r.status} — {r.regional_storage_center_name}
+              — {r.status} — {r.regional_storage_center_name}{" "}
+              <button type="button" onClick={() => toggleResponses(r.id)}>
+                {openRequestId === r.id ? "Hide responses" : "View responses"}
+              </button>
+              {openRequestId === r.id && (
+                <div>
+                  {loadingResponses && <p>Loading responses...</p>}
+                  {!loadingResponses && (responses[r.id] || []).length === 0 && (
+                    <p>No donors have been alerted for this request yet.</p>
+                  )}
+                  <ul>
+                    {(responses[r.id] || []).map((d) => (
+                      <li key={d.id}>
+                        {d.donor_name} — {d.blood_type} — {d.status}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </li>
           ))}
         </ul>
