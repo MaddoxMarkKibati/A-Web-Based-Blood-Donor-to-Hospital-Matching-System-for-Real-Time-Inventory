@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.db.models import Case, IntegerField, Value, When
 from rest_framework import filters, generics, permissions
 from rest_framework.generics import get_object_or_404
-from .alerts import top_up_alerts
+from .alerts import expire_stale_alerts, top_up_alerts
 import logging
 logger = logging.getLogger(__name__)
 
@@ -148,6 +148,12 @@ class RequestResponsesView(generics.ListAPIView):
             pk=self.kwargs["pk"],
             staff=self.request.user.staff_profile,
         )
+        
+        try:
+            expire_stale_alerts(blood_request.pk)
+        except Exception:
+            logger.exception("Alert expiry failed for request %s", blood_request.pk)
+            
         status_order = Case(
             When(status=Notification.Status.ACCEPTED, then=Value(0)),
             When(status=Notification.Status.PENDING, then=Value(1)),

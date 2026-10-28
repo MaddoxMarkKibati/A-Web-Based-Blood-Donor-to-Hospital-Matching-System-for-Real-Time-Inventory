@@ -4,8 +4,15 @@ from rest_framework import generics, permissions
 from accounts.permissions import IsDonor
 from .models import Donor, Donation, Notification
 from .serializers import DonorSerializer, DonorLocationSerializer, DonationSerializer, NotificationSerializer
-from hospitals.alerts import top_up_alerts
+from hospitals.alerts import expire_stale_alerts, top_up_alerts
+
 logger = logging.getLogger(__name__)
+def expire_quietly():
+    try:
+        expire_stale_alerts()
+    except Exception:
+        # Expiry must never stop a donor from seeing or answering alerts.
+        logger.exception("Alert expiry failed")
 
 class MyDonorProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = DonorSerializer
@@ -27,6 +34,7 @@ class MyNotificationsListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDonor]
 
     def get_queryset(self):
+        expire_quietly()
         return Notification.objects.filter(
             donor=self.request.user.donor_profile
         ).select_related("blood_request__regional_storage_center")
@@ -36,6 +44,10 @@ class NotificationRespondView(generics.UpdateAPIView):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated, IsDonor]
 
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        expire_quietly()
+        
     def get_queryset(self):
         return Notification.objects.filter(
             donor=self.request.user.donor_profile
