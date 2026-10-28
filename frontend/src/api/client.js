@@ -4,6 +4,13 @@ function getAccessToken() {
   return localStorage.getItem("access_token");
 }
 
+function readError(errorBody, status) {
+  if (errorBody && errorBody.detail) return errorBody.detail;
+  const values = Array.isArray(errorBody) ? errorBody : Object.values(errorBody || {});
+  const messages = values.flat().filter((m) => typeof m === "string");
+  return messages.length ? messages.join(" ") : `Request failed: ${status}`;
+}
+
 export async function apiFetch(path, options = {}) {
   const token = getAccessToken();
   const headers = {
@@ -19,7 +26,7 @@ export async function apiFetch(path, options = {}) {
 
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
-    throw new Error(errorBody.detail || `Request failed: ${response.status}`);
+    throw new Error(readError(errorBody, response.status));
   }
 
   if (response.status === 204) return null;

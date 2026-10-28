@@ -42,3 +42,10 @@ export async function deleteLocation(id) {
     method: "DELETE",
   });
 }
+
+export async function respondToNotification(id, status) {
+  return apiFetch(`/donors/me/notifications/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}

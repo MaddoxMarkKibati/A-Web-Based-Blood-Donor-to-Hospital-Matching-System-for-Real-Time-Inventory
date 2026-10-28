@@ -10,6 +10,7 @@ import {
   createLocation,
   updateLocation,
   deleteLocation,
+  respondToNotification,
 } from "../api/donors";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -28,6 +29,8 @@ export default function DonorDashboard() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [respondingId, setRespondingId] = useState(null);
+  const [alertError, setAlertError] = useState("");
 
   const [locationForm, setLocationForm] = useState({
     label: "",
@@ -56,6 +59,19 @@ export default function DonorDashboard() {
   }
 
   useEffect(loadAll, []);
+
+    async function handleRespond(id, status) {
+    setAlertError("");
+    setRespondingId(id);
+    try {
+      const updated = await respondToNotification(id, status);
+      setNotifications((prev) => prev.map((n) => (n.id === id ? updated : n)));
+    } catch (err) {
+      setAlertError(err.message);
+    } finally {
+      setRespondingId(null);
+    }
+  }
 
   async function handleSaveProfile(e) {
     e.preventDefault();
@@ -315,11 +331,41 @@ export default function DonorDashboard() {
 
       <section>
         <h2>Recent Alerts</h2>
+        {alertError && <p className="auth-error">{alertError}</p>}
         {notifications.length === 0 && <p>No alerts yet.</p>}
         <ul>
           {notifications.map((n) => (
-            <li key={n.id}>
-              {n.message_type || "Alert"} — {n.status} ({new Date(n.date).toLocaleDateString()})
+                        <li key={n.id}>
+              {n.blood_type ? (
+                <>
+                  <span className={`badge ${n.urgency_level === "critical" ? "badge-critical" : "badge-standard"}`}>
+                    {n.urgency_level}
+                  </span>{" "}
+                  {n.blood_type} x{n.units_needed} at {n.regional_storage_center_name}
+                </>
+              ) : (
+                n.message_type || "Alert"
+              )}{" "}
+              — {n.status} ({new Date(n.date).toLocaleDateString()})
+              {n.status === "pending" && (!n.request_status || n.request_status === "pending") && (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    disabled={respondingId === n.id}
+                    onClick={() => handleRespond(n.id, "accepted")}
+                  >
+                    Accept
+                  </button>{" "}
+                  <button
+                    type="button"
+                    disabled={respondingId === n.id}
+                    onClick={() => handleRespond(n.id, "declined")}
+                  >
+                    Decline
+                  </button>
+                </>
+              )}
             </li>
           ))}
         </ul>
