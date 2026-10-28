@@ -3,6 +3,9 @@ from django.utils import timezone
 from django.db.models import Case, IntegerField, Value, When
 from rest_framework import filters, generics, permissions
 from rest_framework.generics import get_object_or_404
+from .alerts import top_up_alerts
+import logging
+logger = logging.getLogger(__name__)
 
 from accounts.permissions import (
     IsHospitalStaff,
@@ -64,7 +67,11 @@ class BloodRequestListCreateView(generics.ListCreateAPIView):
         return BloodRequest.objects.filter(staff=self.request.user.staff_profile)
 
     def perform_create(self, serializer):
-        serializer.save(staff=self.request.user.staff_profile)
+        blood_request = serializer.save(staff=self.request.user.staff_profile)
+        try:
+            top_up_alerts(blood_request.pk)
+        except Exception:
+            logger.exception("Alert top-up failed for request %s", blood_request.pk)
 
 
 class BloodRequestDetailView(generics.RetrieveUpdateAPIView):
