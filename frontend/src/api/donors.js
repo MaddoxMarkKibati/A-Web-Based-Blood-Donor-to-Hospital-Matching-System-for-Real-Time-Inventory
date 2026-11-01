@@ -49,3 +49,17 @@ export async function respondToNotification(id, status) {
     body: JSON.stringify({ status }),
   });
 }
+
+export async function savePushSubscription(subscription) {
+  return apiFetch("/donors/me/push-subscription/", {
+    method: "POST",
+    body: JSON.stringify(subscription),
+  });
+}
+
+export async function removePushSubscription(endpoint) {
+  return apiFetch("/donors/me/push-subscription/", {
+    method: "DELETE",
+    body: JSON.stringify({ endpoint }),
+  });
+}

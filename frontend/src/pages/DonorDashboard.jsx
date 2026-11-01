@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
+import PushToggle from "../components/PushToggle";
 import {
   fetchMyProfile,
   updateMyProfile,
@@ -329,6 +330,7 @@ export default function DonorDashboard() {
         </form>
       </section>
 
+      <PushToggle />
       <section>
         <h2>Recent Alerts</h2>
         {alertError && <p className="auth-error">{alertError}</p>}
