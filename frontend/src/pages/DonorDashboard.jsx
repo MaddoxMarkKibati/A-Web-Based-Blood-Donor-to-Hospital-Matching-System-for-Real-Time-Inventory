@@ -344,6 +344,7 @@ export default function DonorDashboard() {
                     {n.urgency_level}
                   </span>{" "}
                   {n.blood_type} x{n.units_needed} at {n.regional_storage_center_name}
+                  {n.distance_km != null && ` (about ${n.distance_km} km from your nearest saved location)`}
                 </>
               ) : (
                 n.message_type || "Alert"

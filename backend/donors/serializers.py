@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField
 from .models import Donor, DonorLocation, Donation, Notification
+from django.contrib.gis.db.models.functions import Distance
 
 class DonorSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
@@ -96,16 +97,33 @@ class NotificationSerializer(serializers.ModelSerializer):
         read_only=True,
         default=None,
     )
-
+    distance_km = serializers.SerializerMethodField()
+    
     class Meta:
         model = Notification
         fields = [
             "id", "donor", "blood_request", "date", "status", "message_type",
             "blood_type", "units_needed", "urgency_level", "request_status",
-            "regional_storage_center_name",
+            "regional_storage_center_name", "distance_km",
         ]
         read_only_fields = ["id", "donor", "blood_request", "date", "message_type"]
-
+    
+    def get_distance_km(self, obj):
+        request = obj.blood_request
+        if request is None:
+            return None
+        origin = request.regional_storage_center.location
+        if origin is None:
+            return None
+        nearest = (
+            obj.donor.locations.annotate(distance=Distance("point", origin))
+            .order_by("distance")
+            .first()
+        )
+        if nearest is None:
+            return None
+        return round(nearest.distance.km, 1)
+    
     def validate_status(self, value):
         if value not in (Notification.Status.ACCEPTED, Notification.Status.DECLINED):
             raise serializers.ValidationError("You can only accept or decline an alert.")
