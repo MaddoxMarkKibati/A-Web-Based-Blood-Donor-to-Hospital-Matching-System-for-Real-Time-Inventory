@@ -4,6 +4,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from donors.models import Notification
+from donors.push import send_alert_push
 
 from .matching import ranked_candidates
 from .models import BloodRequest
@@ -65,6 +66,9 @@ def top_up_alerts(blood_request_id):
         )
         if was_created:
             created.append(notification)
+            # Send only after the transaction commits, so a donor is never
+            # pushed about an alert that was rolled back.
+            transaction.on_commit(lambda n=notification: send_alert_push(n))
     return created
 
 def expire_stale_alerts(blood_request_id=None):
