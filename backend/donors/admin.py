@@ -26,3 +26,7 @@ class DonationAdmin(admin.ModelAdmin):
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ("donor", "status", "message_type", "date")
     list_filter = ("status",)
+    
+from .models import PushSubscription
+
+admin.site.register(PushSubscription)

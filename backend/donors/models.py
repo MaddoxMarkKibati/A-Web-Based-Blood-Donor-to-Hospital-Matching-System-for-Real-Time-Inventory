@@ -185,3 +185,17 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.donor} — {self.status}"
+    
+class PushSubscription(models.Model):
+    donor = models.ForeignKey(
+        Donor,
+        on_delete=models.CASCADE,
+        related_name="push_subscriptions",
+    )
+    endpoint = models.TextField(unique=True)
+    p256dh = models.CharField(max_length=255)
+    auth = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.donor} - device added {self.created_at:%Y-%m-%d}"
