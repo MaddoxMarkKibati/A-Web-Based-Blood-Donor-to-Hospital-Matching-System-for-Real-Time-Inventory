@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
 import PushToggle from "../components/PushToggle";
+import LocationPicker from "../components/LocationPicker";
 import {
   fetchMyProfile,
   updateMyProfile,
@@ -76,6 +77,10 @@ export default function DonorDashboard() {
 
   async function handleSaveProfile(e) {
     e.preventDefault();
+    if (locationForm.lat === "" || locationForm.lng === "") {
+      setError("Tap the map or search for a place to set your pin first.");
+      return;
+    }
     setSaving(true);
     setError("");
     setMessage("");
@@ -133,27 +138,14 @@ export default function DonorDashboard() {
     }
   }
 
-  async function handleUseMyLocation() {
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by this browser.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocationForm((f) => ({
-          ...f,
-          lat: pos.coords.latitude.toFixed(6),
-          lng: pos.coords.longitude.toFixed(6),
-        }));
-      },
-      () => setError("Could not get your current location.")
-    );
-  }
-
   if (loading) return <p>Loading...</p>;
 
   const frequentCount = locations.filter((l) => l.location_type === "frequent").length;
   const liveCount = locations.filter((l) => l.location_type === "live").length;
+  const firstLocation = locations[0];
+  const mapCenter = firstLocation
+    ? [firstLocation.point.coordinates[1], firstLocation.point.coordinates[0]]
+    : undefined;
   const bloodTypeLocked = Boolean(profile.blood_type);
 
   return (
@@ -301,29 +293,15 @@ export default function DonorDashboard() {
             <option value="live">Live / Current (up to 1, optional)</option>
           </select>
 
-          <label htmlFor="loc_lat">Latitude</label>
-          <input
-            id="loc_lat"
-            type="number"
-            step="any"
-            value={locationForm.lat}
-            onChange={(e) => setLocationForm({ ...locationForm, lat: e.target.value })}
-            required
+          <label>Pin your location</label>
+          <LocationPicker
+            lat={locationForm.lat}
+            lng={locationForm.lng}
+            center={mapCenter}
+            onChange={({ lat, lng }) =>
+              setLocationForm((f) => ({ ...f, lat, lng }))
+            }
           />
-
-          <label htmlFor="loc_lng">Longitude</label>
-          <input
-            id="loc_lng"
-            type="number"
-            step="any"
-            value={locationForm.lng}
-            onChange={(e) => setLocationForm({ ...locationForm, lng: e.target.value })}
-            required
-          />
-
-          <button type="button" onClick={handleUseMyLocation}>
-            Use My Current Location
-          </button>
           <button type="submit" disabled={addingLocation}>
             {addingLocation ? "Adding..." : "Add Location"}
           </button>
