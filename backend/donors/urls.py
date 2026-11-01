@@ -7,6 +7,7 @@ from .views import (
     NotificationRespondView,
     MyLocationsListCreateView,
     MyLocationDetailView,
+    PushSubscriptionView,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("me/notifications/<int:pk>/", NotificationRespondView.as_view(), name="donor-notification-respond"),
     path("me/locations/", MyLocationsListCreateView.as_view(), name="donor-locations"),
     path("me/locations/<int:pk>/", MyLocationDetailView.as_view(), name="donor-location-detail"),
+    path("me/push-subscription/", PushSubscriptionView.as_view(), name="donor-push-subscription"),
 ]

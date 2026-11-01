@@ -1,8 +1,10 @@
 import logging
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from accounts.permissions import IsDonor
-from .models import Donor, Donation, Notification
+from .models import Donor, Donation, Notification, PushSubscription
 from .serializers import DonorSerializer, DonorLocationSerializer, DonationSerializer, NotificationSerializer
 from hospitals.alerts import expire_stale_alerts, top_up_alerts
 
@@ -84,3 +86,41 @@ class MyLocationDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return self.request.user.donor_profile.locations.all()
+    
+class PushSubscriptionView(APIView):
+    """Save (POST) or remove (DELETE) the logged-in donor's push subscription
+    for one device. POST takes the browser's subscription JSON."""
+
+    permission_classes = [permissions.IsAuthenticated, IsDonor]
+
+    def post(self, request):
+        keys = request.data.get("keys") or {}
+        endpoint = request.data.get("endpoint")
+        p256dh = keys.get("p256dh")
+        auth = keys.get("auth")
+        if not (endpoint and p256dh and auth):
+            return Response(
+                {"detail": "endpoint and keys (p256dh, auth) are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        PushSubscription.objects.update_or_create(
+            endpoint=endpoint,
+            defaults={
+                "donor": request.user.donor_profile,
+                "p256dh": p256dh,
+                "auth": auth,
+            },
+        )
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        endpoint = request.data.get("endpoint")
+        if not endpoint:
+            return Response(
+                {"detail": "endpoint is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        PushSubscription.objects.filter(
+            donor=request.user.donor_profile, endpoint=endpoint
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
