@@ -35,7 +35,10 @@ export default function AdminDashboard() {
         setCenters(c);
         setInventory(i);
         if (c.length > 0) {
-          setForm((f) => ({ ...f, regional_storage_center: c[0].id }));
+          setForm((f) => ({
+            ...f,
+            regional_storage_center: f.regional_storage_center || c[0].id,
+          }));
         }
       })
       .catch((err) => setError(err.message))
@@ -54,16 +57,14 @@ export default function AdminDashboard() {
   }
   
   async function handleRecordDonation(e) {
+    e.preventDefault();
     if (!form.donor) {
       setError("Select a donor first.");
       return;
     }
-    e.preventDefault();
     setSubmitting(true);
     setError("");
     setMessage("");
-    setSelectedDonor(null);
-    setForm((f) => ({ ...f, donor: "", blood_type: "" }));
     try {
       const donation = await recordDonation({
         ...form,
@@ -74,6 +75,8 @@ export default function AdminDashboard() {
       setMessage(
         `Recorded: ${donation.donor_name} donated ${donation.units_donated} unit(s) of ${donation.blood_type} at ${donation.regional_storage_center_name}.`
       );
+      setSelectedDonor(null);
+      setForm((f) => ({ ...f, donor: "", blood_type: "" }));
       loadData();
     } catch (err) {
       setError(err.message);
