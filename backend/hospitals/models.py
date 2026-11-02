@@ -88,3 +88,21 @@ class BloodRequest(models.Model):
 
     def __str__(self):
         return f"{self.blood_type} x{self.units_needed} ({self.status})"
+    
+class ReserveThreshold(models.Model):
+    """Minimum national stock per blood type. Below it is 'low', below half of
+    it is 'critical'."""
+
+    DEFAULT_MINIMUM = 10
+
+    blood_type = models.CharField(
+        max_length=3, choices=BloodInventory.BLOOD_TYPE_CHOICES, unique=True
+    )
+    minimum_units = models.PositiveIntegerField(default=DEFAULT_MINIMUM)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["blood_type"]
+
+    def __str__(self):
+        return f"{self.blood_type}: minimum {self.minimum_units}"

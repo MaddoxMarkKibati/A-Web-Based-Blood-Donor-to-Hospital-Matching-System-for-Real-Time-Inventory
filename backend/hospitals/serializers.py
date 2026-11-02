@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField
 
-from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest
+from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest, ReserveThreshold
 
 
 class HospitalSerializer(serializers.ModelSerializer):
@@ -46,3 +46,9 @@ class BloodRequestSerializer(serializers.ModelSerializer):
             "urgency_level", "status", "created_at",
         ]
         read_only_fields = ["id", "staff", "created_at"]
+
+class ReserveThresholdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReserveThreshold
+        fields = ["id", "blood_type", "minimum_units", "updated_at"]
+        read_only_fields = ["id", "blood_type", "updated_at"]

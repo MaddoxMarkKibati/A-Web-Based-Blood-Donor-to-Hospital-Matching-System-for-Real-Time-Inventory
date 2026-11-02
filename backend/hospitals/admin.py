@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest
+from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest, ReserveThreshold
 
 
 @admin.register(Hospital)
@@ -25,3 +25,7 @@ class BloodInventoryAdmin(admin.ModelAdmin):
 class BloodRequestAdmin(admin.ModelAdmin):
     list_display = ("regional_storage_center", "blood_type", "units_needed", "urgency_level", "status", "created_at")
     list_filter = ("status", "urgency_level", "blood_type")
+    
+@admin.register(ReserveThreshold)
+class ReserveThresholdAdmin(admin.ModelAdmin):
+    list_display = ("blood_type", "minimum_units", "updated_at")

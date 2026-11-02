@@ -11,6 +11,8 @@ from .views import (
     RecordDonationView,
     DonorBloodTypeOverrideView,
     RequestResponsesView,
+    ReserveThresholdListView,
+    ReserveThresholdUpdateView,
 )
 
 urlpatterns = [
@@ -24,4 +26,6 @@ urlpatterns = [
     path("donors/<int:pk>/blood-type/", DonorBloodTypeOverrideView.as_view(), name="donor-blood-type-override"),
     path("donors/", DonorSearchView.as_view(), name="donor-search"),
     path("requests/<int:pk>/responses/", RequestResponsesView.as_view(), name="request-responses"),
+    path("thresholds/", ReserveThresholdListView.as_view(), name="threshold-list"),
+    path("thresholds/<int:pk>/", ReserveThresholdUpdateView.as_view(), name="threshold-detail"),
 ]

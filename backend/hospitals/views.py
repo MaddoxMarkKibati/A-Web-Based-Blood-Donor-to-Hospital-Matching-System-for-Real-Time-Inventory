@@ -20,12 +20,13 @@ from donors.serializers import (
     RequestResponseSerializer,
 )
 
-from .models import BloodInventory, BloodRequest, Hospital, RegionalStorageCenter
+from .models import BloodInventory, BloodRequest, Hospital, RegionalStorageCenter, ReserveThreshold
 from .serializers import (
     BloodInventorySerializer,
     BloodRequestSerializer,
     HospitalSerializer,
     RegionalStorageCenterSerializer,
+    ReserveThresholdSerializer
 )
 
 
@@ -167,3 +168,20 @@ class RequestResponsesView(generics.ListAPIView):
             .annotate(status_order=status_order)
             .order_by("status_order", "-date")
         )
+        
+class ReserveThresholdListView(generics.ListAPIView):
+    """Minimum stock per blood type. Missing rows are created at the default."""
+
+    serializer_class = ReserveThresholdSerializer
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaffOrKNBTSAdmin]
+
+    def get_queryset(self):
+        for blood_type, _ in BloodInventory.BLOOD_TYPE_CHOICES:
+            ReserveThreshold.objects.get_or_create(blood_type=blood_type)
+        return ReserveThreshold.objects.all()
+
+
+class ReserveThresholdUpdateView(generics.UpdateAPIView):
+    queryset = ReserveThreshold.objects.all()
+    serializer_class = ReserveThresholdSerializer
+    permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
