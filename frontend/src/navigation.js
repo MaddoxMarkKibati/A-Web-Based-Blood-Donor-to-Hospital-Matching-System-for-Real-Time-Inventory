@@ -19,7 +19,6 @@ export const NAV = {
     { to: "/donor/locations", label: "My locations", end: true },
     { to: "/donor/history", label: "Donation history", end: true },
     { to: "/donor/profile", label: "Profile", end: true },
-    { to: "/donor/classic", label: "Full dashboard (temporary)", end: true },
   ],
   hospital_staff: [{ to: "/hospital", label: "Requests", end: true }],
   knbts_admin: [{ to: "/admin", label: "Overview", end: true }],

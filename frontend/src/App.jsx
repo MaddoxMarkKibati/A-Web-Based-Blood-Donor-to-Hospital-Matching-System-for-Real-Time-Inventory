@@ -4,7 +4,6 @@ import { HOME } from "./navigation";
 import AppShell from "./components/AppShell";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import DonorDashboard from "./pages/DonorDashboard";
 import HospitalDashboard from "./pages/HospitalDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import DonorHome from "./pages/donor/DonorHome";
@@ -93,14 +92,6 @@ function App() {
             element={
               <RequireRole role="donor">
                 <DonorProfile />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/donor/classic"
-            element={
-              <RequireRole role="donor">
-                <DonorDashboard />
               </RequireRole>
             }
           />
