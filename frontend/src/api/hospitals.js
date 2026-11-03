@@ -47,3 +47,14 @@ export async function correctDonorBloodType(id, bloodType) {
 export async function fetchRequestResponses(requestId) {
   return apiFetch(`/hospitals/requests/${requestId}/responses/`);
 }
+
+export async function updateRequestStatus(id, status) {
+  return apiFetch(`/hospitals/requests/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function fetchReserveThresholds() {
+  return apiFetch("/hospitals/thresholds/");
+}
