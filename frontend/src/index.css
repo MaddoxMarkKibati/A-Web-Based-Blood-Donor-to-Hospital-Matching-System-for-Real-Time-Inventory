@@ -573,3 +573,42 @@ label {
 .location-form { max-width: 40rem; }
 
 .profile-form { max-width: 40rem; }
+
+.request-form { max-width: 40rem; }
+
+.type-selector {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  max-width: 24rem;
+}
+.type-option {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.type-option .blood-tag { border-color: transparent; font-size: 1.15rem; }
+.type-option[aria-checked="true"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+:root[data-theme="dark"] .type-option[aria-checked="true"] { background: var(--color-primary-dark); }
+.type-option[aria-checked="true"] .blood-tag { color: #ffffff; }
+
+.segmented {
+  display: inline-flex;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.segmented button {
+  border: 0;
+  border-radius: 0;
+  background: var(--color-surface);
+  padding: 0.5rem 1.2rem;
+}
+.segmented button[aria-checked="true"] { background: var(--color-text); color: var(--color-bg); }
+.segmented button.is-critical[aria-checked="true"] { background: var(--color-critical); color: #ffffff; }

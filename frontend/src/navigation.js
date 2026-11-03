@@ -20,6 +20,9 @@ export const NAV = {
     { to: "/donor/history", label: "Donation history", end: true },
     { to: "/donor/profile", label: "Profile", end: true },
   ],
-  hospital_staff: [{ to: "/hospital", label: "Requests", end: true }],
+  hospital_staff: [
+    { to: "/hospital", label: "Requests", end: true },
+    { to: "/hospital/classic", label: "Full dashboard (temporary)", end: true },
+  ],
   knbts_admin: [{ to: "/admin", label: "Overview", end: true }],
 };
