@@ -6,16 +6,24 @@ from django.contrib.gis.db.models.functions import Distance
 class DonorSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     full_name = serializers.CharField(read_only=True)
+    eligibility_issues = serializers.SerializerMethodField()
+    is_eligible = serializers.SerializerMethodField()
 
     class Meta:
         model = Donor
         fields = [
             "id", "email", "first_name", "middle_names", "last_name", "full_name", "blood_type", "phone",
             "is_verified", "last_donation_date",
-            "date_of_birth", "gender", "weight_kg", "height_cm", "national_id",
+            "date_of_birth", "gender", "weight_kg", "height_cm", "national_id", "eligibility_issues", "is_eligible",
         ]
         read_only_fields = ["id", "is_verified", "last_donation_date"]
 
+    def get_eligibility_issues(self, obj):
+        return obj.eligibility_issues()
+
+    def get_is_eligible(self, obj):
+        return obj.is_eligible
+    
     def validate_blood_type(self, value):
         instance = self.instance
         if instance and instance.blood_type and value != instance.blood_type:
