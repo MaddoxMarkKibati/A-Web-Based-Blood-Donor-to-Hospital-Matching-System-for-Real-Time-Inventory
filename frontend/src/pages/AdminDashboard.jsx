@@ -23,8 +23,6 @@ export default function AdminDashboard() {
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [donationsVersion, setDonationsVersion] = useState(0);
-  const [filterBloodType, setFilterBloodType] = useState("");
-  const [filterCounty, setFilterCounty] = useState("");
 
   const [form, setForm] = useState({
     donor: "",
@@ -98,17 +96,6 @@ export default function AdminDashboard() {
 
   const totalUnits = inventory.reduce((sum, i) => sum + i.units_available, 0);
 
-  const filteredInventory = inventory.filter((i) => {
-    if (filterBloodType && i.blood_type !== filterBloodType) return false;
-    if (filterCounty) {
-      const center = centers.find((c) => c.id === i.regional_storage_center);
-      if (!center || center.county !== filterCounty) return false;
-    }
-    return true;
-  });
-
-  const counties = [...new Set(centers.map((c) => c.county))];
-
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -129,41 +116,10 @@ export default function AdminDashboard() {
         <p>Total Units Nationwide: {totalUnits}</p>
         <p>Regional Storage Centers: {centers.length}</p>
       </section>
+
       <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
-      <ThresholdEditor thresholds={thresholds} onUpdated={handleThresholdUpdated} />
+
       <RequestMonitor />
-      <RecentDonations refreshKey={donationsVersion} />
-
-      <section>
-        <h2>Filter by Blood Type / County</h2>
-        <select value={filterBloodType} onChange={(e) => setFilterBloodType(e.target.value)}>
-          <option value="">All blood types</option>
-          {BLOOD_TYPES.map((bt) => (
-            <option key={bt} value={bt}>{bt}</option>
-          ))}
-        </select>
-        <select value={filterCounty} onChange={(e) => setFilterCounty(e.target.value)}>
-          <option value="">All counties</option>
-          {counties.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-      </section>
-
-      <section>
-        <h2>Stock by Region</h2>
-        {filteredInventory.length === 0 && <p>No matching inventory records.</p>}
-        <ul>
-          {filteredInventory.map((i) => (
-            <li key={i.id}>
-              {i.regional_storage_center_name} — {i.blood_type}:{" "}
-              <span className={`badge ${i.units_available < 5 ? "badge-critical" : "badge-standard"}`}>
-                {i.units_available} units
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       <section>
         <h2>Record Donation</h2>
@@ -210,6 +166,12 @@ export default function AdminDashboard() {
           </button>
         </form>
       </section>
+
+      <RecentDonations refreshKey={donationsVersion} />
+
+      <ThresholdEditor thresholds={thresholds} onUpdated={handleThresholdUpdated} />
+
+      <BloodTypeCorrection />
     </div>
   );
 }

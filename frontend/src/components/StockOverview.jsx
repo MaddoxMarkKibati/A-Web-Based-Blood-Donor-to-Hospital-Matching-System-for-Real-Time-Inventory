@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { BLOOD_TYPES, stockLevel } from "../utils/stock";
 
 const LEVEL_LABEL = { ok: "OK", low: "Low", critical: "Critical" };
 
 export default function StockOverview({ centers, inventory, thresholds }) {
+  const [filterBloodType, setFilterBloodType] = useState("");
+  const [filterCounty, setFilterCounty] = useState("");
+
   const minimumFor = (bloodType) =>
     thresholds.find((t) => t.blood_type === bloodType)?.minimum_units ?? 10;
 
@@ -12,6 +16,10 @@ export default function StockOverview({ centers, inventory, thresholds }) {
     totals[item.blood_type] += item.units_available;
     cells[`${item.regional_storage_center}-${item.blood_type}`] = item.units_available;
   }
+
+  const counties = [...new Set(centers.map((c) => c.county))];
+  const visibleCenters = centers.filter((c) => !filterCounty || c.county === filterCounty);
+  const visibleTypes = filterBloodType ? [filterBloodType] : BLOOD_TYPES;
 
   return (
     <>
@@ -45,21 +53,35 @@ export default function StockOverview({ centers, inventory, thresholds }) {
 
       <section>
         <h2>Stock Matrix</h2>
+        <div className="stock-filters">
+          <select value={filterCounty} onChange={(e) => setFilterCounty(e.target.value)}>
+            <option value="">All counties</option>
+            {counties.map((county) => (
+              <option key={county} value={county}>{county}</option>
+            ))}
+          </select>
+          <select value={filterBloodType} onChange={(e) => setFilterBloodType(e.target.value)}>
+            <option value="">All blood types</option>
+            {BLOOD_TYPES.map((bt) => (
+              <option key={bt} value={bt}>{bt}</option>
+            ))}
+          </select>
+        </div>
         <div className="stock-matrix-wrap">
           <table className="stock-matrix">
             <thead>
               <tr>
                 <th>Region</th>
-                {BLOOD_TYPES.map((bt) => (
+                {visibleTypes.map((bt) => (
                   <th key={bt}>{bt}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {centers.map((c) => (
+              {visibleCenters.map((c) => (
                 <tr key={c.id}>
                   <th scope="row">{c.region_name}</th>
-                  {BLOOD_TYPES.map((bt) => {
+                  {visibleTypes.map((bt) => {
                     const units = cells[`${c.id}-${bt}`] ?? 0;
                     return (
                       <td key={bt} className={units === 0 ? "stock-cell-empty" : ""}>
