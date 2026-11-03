@@ -7,6 +7,7 @@ import { fetchRegionalStorageCenters } from "../api/hospitals";
 import { fetchAllInventory, recordDonation, fetchThresholds } from "../api/admin";
 import StockOverview from "../components/StockOverview";
 import ThresholdEditor from "../components/ThresholdEditor";
+import RequestMonitor from "../components/RequestMonitor";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -128,7 +129,8 @@ export default function AdminDashboard() {
       </section>
       <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
       <ThresholdEditor thresholds={thresholds} onUpdated={handleThresholdUpdated} />
-
+      <RequestMonitor />
+      
       <section>
         <h2>Filter by Blood Type / County</h2>
         <select value={filterBloodType} onChange={(e) => setFilterBloodType(e.target.value)}>
