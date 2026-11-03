@@ -61,28 +61,43 @@ class BloodInventoryUpdateView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
 
 
+def with_response_counts(queryset):
+    """Adds how many donors were alerted and how many accepted to each request."""
+    return queryset.annotate(
+        alerted_count=Count("notifications"),
+        accepted_count=Count(
+            "notifications",
+            filter=Q(notifications__status=Notification.Status.ACCEPTED),
+        ),
+    )
 class BloodRequestListCreateView(generics.ListCreateAPIView):
     serializer_class = BloodRequestSerializer
     permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
 
     def get_queryset(self):
-        return BloodRequest.objects.filter(staff=self.request.user.staff_profile)
+        return with_response_counts(
+            BloodRequest.objects.filter(staff=self.request.user.staff_profile)
+        )
 
     def perform_create(self, serializer):
         blood_request = serializer.save(staff=self.request.user.staff_profile)
+        alerted = 0
         try:
-            top_up_alerts(blood_request.pk)
+            alerted = len(top_up_alerts(blood_request.pk))
         except Exception:
+            # A matching failure must never block the hospital from posting.
             logger.exception("Alert top-up failed for request %s", blood_request.pk)
-
+        blood_request.alerted_count = alerted
+        blood_request.accepted_count = 0
 
 class BloodRequestDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = BloodRequestSerializer
     permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
 
     def get_queryset(self):
-        return BloodRequest.objects.filter(staff=self.request.user.staff_profile)
-
+        return with_response_counts(
+            BloodRequest.objects.filter(staff=self.request.user.staff_profile)
+        )
 
 class RecordDonationView(generics.CreateAPIView):
     serializer_class = DonationSerializer

@@ -37,13 +37,14 @@ class BloodRequestSerializer(serializers.ModelSerializer):
         source="regional_storage_center.region_name", read_only=True
     )
     staff_name = serializers.CharField(source="staff.full_name", read_only=True, default=None)
-
+    alerted_count = serializers.IntegerField(read_only=True, default=0)
+    accepted_count = serializers.IntegerField(read_only=True, default=0)
     class Meta:
         model = BloodRequest
         fields = [
             "id", "regional_storage_center", "regional_storage_center_name",
             "staff", "staff_name", "blood_type", "units_needed",
-            "urgency_level", "status", "created_at",
+            "urgency_level", "status", "created_at", "alerted_count", "accepted_count",
         ]
         read_only_fields = ["id", "staff", "created_at"]
         
