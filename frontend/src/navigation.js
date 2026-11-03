@@ -13,7 +13,10 @@ export const ROLE_LABEL = {
 
 // Sidebar items per role. Later steps add pages here as they are built.
 export const NAV = {
-  donor: [{ to: "/donor", label: "Home", end: true }],
+  donor: [
+    { to: "/donor", label: "Home", end: true },
+    { to: "/donor/classic", label: "Full dashboard (temporary)", end: true },
+  ],
   hospital_staff: [{ to: "/hospital", label: "Requests", end: true }],
   knbts_admin: [{ to: "/admin", label: "Overview", end: true }],
 };

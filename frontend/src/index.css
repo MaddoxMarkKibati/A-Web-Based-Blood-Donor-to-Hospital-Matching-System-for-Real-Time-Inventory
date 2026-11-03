@@ -492,3 +492,36 @@ label {
   .shell-nav a.active { border-top-color: var(--color-primary); }
   .shell-main { padding-bottom: 4rem; }
 }
+
+.page { max-width: 900px; padding: 1.5rem; }
+.page-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.donor-card {
+  max-width: 34rem;
+  margin-bottom: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.donor-card-band {
+  padding: 0.9rem 1.25rem;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+:root[data-theme="dark"] .donor-card-band { background: var(--color-primary-dark); }
+.donor-card-body { display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem; }
+.donor-card-status { margin: 0 0 0.2rem; font-weight: 600; }
+.donor-card-status.is-eligible { color: var(--color-success); }
+.donor-card-status.not-eligible { color: var(--color-warning); }
+.donor-card-meta { margin: 0; color: var(--color-text-muted); font-size: 0.9rem; }
+.attention-list { margin: 0 0 1rem; padding-left: 1.2rem; }
