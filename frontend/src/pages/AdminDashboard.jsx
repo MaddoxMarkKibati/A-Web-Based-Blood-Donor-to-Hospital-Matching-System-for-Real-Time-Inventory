@@ -8,6 +8,7 @@ import { fetchAllInventory, recordDonation, fetchThresholds } from "../api/admin
 import StockOverview from "../components/StockOverview";
 import ThresholdEditor from "../components/ThresholdEditor";
 import RequestMonitor from "../components/RequestMonitor";
+import RecentDonations from "../components/RecentDonations";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -21,7 +22,7 @@ export default function AdminDashboard() {
   const [message, setMessage] = useState("");
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-
+  const [donationsVersion, setDonationsVersion] = useState(0);
   const [filterBloodType, setFilterBloodType] = useState("");
   const [filterCounty, setFilterCounty] = useState("");
 
@@ -82,6 +83,7 @@ export default function AdminDashboard() {
       );
       setSelectedDonor(null);
       setForm((f) => ({ ...f, donor: "", blood_type: "" }));
+      setDonationsVersion((v) => v + 1);
       loadData();
     } catch (err) {
       setError(err.message);
@@ -130,7 +132,8 @@ export default function AdminDashboard() {
       <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
       <ThresholdEditor thresholds={thresholds} onUpdated={handleThresholdUpdated} />
       <RequestMonitor />
-      
+      <RecentDonations refreshKey={donationsVersion} />
+
       <section>
         <h2>Filter by Blood Type / County</h2>
         <select value={filterBloodType} onChange={(e) => setFilterBloodType(e.target.value)}>
