@@ -15,6 +15,7 @@ export const ROLE_LABEL = {
 export const NAV = {
   donor: [
     { to: "/donor", label: "Home", end: true },
+    { to: "/donor/alerts", label: "Alerts", end: true },
     { to: "/donor/classic", label: "Full dashboard (temporary)", end: true },
   ],
   hospital_staff: [{ to: "/hospital", label: "Requests", end: true }],

@@ -85,7 +85,7 @@ export default function PushToggle() {
   }
 
   return (
-    <section>
+      <section className="page-panel">
       <h2>Device Alerts</h2>
       {!supported ? (
         <p>This browser does not support push alerts.</p>
