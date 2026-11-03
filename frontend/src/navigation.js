@@ -17,6 +17,8 @@ export const NAV = {
     { to: "/donor", label: "Home", end: true },
     { to: "/donor/alerts", label: "Alerts", end: true },
     { to: "/donor/locations", label: "My locations", end: true },
+    { to: "/donor/history", label: "Donation history", end: true },
+    { to: "/donor/profile", label: "Profile", end: true },
     { to: "/donor/classic", label: "Full dashboard (temporary)", end: true },
   ],
   hospital_staff: [{ to: "/hospital", label: "Requests", end: true }],

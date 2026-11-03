@@ -10,6 +10,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import DonorHome from "./pages/donor/DonorHome";
 import DonorAlerts from "./pages/donor/DonorAlerts";
 import DonorLocations from "./pages/donor/DonorLocations";
+import DonorHistory from "./pages/donor/DonorHistory";
+import DonorProfile from "./pages/donor/DonorProfile";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -75,6 +77,22 @@ function App() {
             element={
               <RequireRole role="donor">
                 <DonorLocations />
+              </RequireRole>
+            }
+          />
+                    <Route
+            path="/donor/history"
+            element={
+              <RequireRole role="donor">
+                <DonorHistory />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/donor/profile"
+            element={
+              <RequireRole role="donor">
+                <DonorProfile />
               </RequireRole>
             }
           />
