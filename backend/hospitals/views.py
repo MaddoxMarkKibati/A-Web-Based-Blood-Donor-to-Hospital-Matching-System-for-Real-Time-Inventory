@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
 from django.db.models import Case, Count, IntegerField, Q, Value, When
+from django.contrib.gis.db.models.functions import Distance
 from rest_framework import filters, generics, permissions
 from rest_framework.generics import get_object_or_404
 from .alerts import expire_stale_alerts, top_up_alerts
@@ -12,7 +13,7 @@ from accounts.permissions import (
     IsHospitalStaffOrKNBTSAdmin,
     IsKNBTSAdmin,
 )
-from donors.models import Donation, Donor, Notification
+from donors.models import Donation, Donor, DonorLocation, Notification
 from donors.serializers import (
     DonationSerializer,
     DonorSerializer,
@@ -153,8 +154,11 @@ class DonorSearchView(generics.ListAPIView):
         return super().filter_queryset(queryset)[:20]
     
 class RequestResponsesView(generics.ListAPIView):
-    """Donors alerted for one of the logged-in staff member's blood requests,
-    with their response status."""
+    """Donors alerted for one of the logged-in staff member's blood requests.
+
+    Ranked: accepted, then pending, declined and expired. Within each group an
+    exact blood type match comes before a compatible one, then nearest first.
+    """
 
     serializer_class = RequestResponseSerializer
     permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
@@ -165,25 +169,42 @@ class RequestResponsesView(generics.ListAPIView):
             pk=self.kwargs["pk"],
             staff=self.request.user.staff_profile,
         )
-        
         try:
             expire_stale_alerts(blood_request.pk)
         except Exception:
             logger.exception("Alert expiry failed for request %s", blood_request.pk)
-            
-        status_order = Case(
-            When(status=Notification.Status.ACCEPTED, then=Value(0)),
-            When(status=Notification.Status.PENDING, then=Value(1)),
-            When(status=Notification.Status.DECLINED, then=Value(2)),
-            default=Value(3),
-            output_field=IntegerField(),
+
+        notifications = list(
+            Notification.objects.filter(blood_request=blood_request).select_related("donor")
         )
-        return (
-            Notification.objects.filter(blood_request=blood_request)
-            .select_related("donor")
-            .annotate(status_order=status_order)
-            .order_by("status_order", "-date")
-        )
+
+        # Each donor's distance from the centre, using their nearest saved location.
+        distances = {}
+        origin = blood_request.regional_storage_center.location
+        if origin is not None:
+            locations = DonorLocation.objects.filter(
+                donor_id__in=[n.donor_id for n in notifications]
+            ).annotate(distance=Distance("point", origin))
+            for loc in locations:
+                metres = loc.distance.m
+                if loc.donor_id not in distances or metres < distances[loc.donor_id]:
+                    distances[loc.donor_id] = metres
+
+        status_rank = {
+            Notification.Status.ACCEPTED: 0,
+            Notification.Status.PENDING: 1,
+            Notification.Status.DECLINED: 2,
+        }
+
+        def sort_key(n):
+            return (
+                status_rank.get(n.status, 3),
+                0 if n.donor.blood_type == blood_request.blood_type else 1,
+                distances.get(n.donor_id, float("inf")),
+                -n.date.timestamp(),
+            )
+
+        return sorted(notifications, key=sort_key)
         
 class ReserveThresholdListView(generics.ListAPIView):
     """Minimum stock per blood type. Missing rows are created at the default."""
