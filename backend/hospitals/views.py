@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.utils import timezone
-from django.db.models import Case, IntegerField, Value, When
+from django.db.models import Case, Count, IntegerField, Q, Value, When
 from rest_framework import filters, generics, permissions
 from rest_framework.generics import get_object_or_404
 from .alerts import expire_stale_alerts, top_up_alerts
@@ -12,7 +12,7 @@ from accounts.permissions import (
     IsHospitalStaffOrKNBTSAdmin,
     IsKNBTSAdmin,
 )
-from donors.models import Donor, Notification
+from donors.models import Donation, Donor, Notification
 from donors.serializers import (
     DonationSerializer,
     DonorSerializer,
@@ -26,7 +26,8 @@ from .serializers import (
     BloodRequestSerializer,
     HospitalSerializer,
     RegionalStorageCenterSerializer,
-    ReserveThresholdSerializer
+    ReserveThresholdSerializer,
+    RequestMonitorSerializer,
 )
 
 
@@ -185,3 +186,36 @@ class ReserveThresholdUpdateView(generics.UpdateAPIView):
     queryset = ReserveThreshold.objects.all()
     serializer_class = ReserveThresholdSerializer
     permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
+
+class RequestMonitorView(generics.ListAPIView):
+    """KNBTS admin view of blood requests with how many donors were alerted and
+    how they responded. Open requests by default; ?status=all for everything."""
+
+    serializer_class = RequestMonitorSerializer
+    permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
+
+    def get_queryset(self):
+        status = self.request.query_params.get("status", BloodRequest.Status.PENDING)
+        queryset = BloodRequest.objects.select_related("regional_storage_center", "staff")
+        if status != "all":
+            queryset = queryset.filter(status=status)
+
+        n = Notification.Status
+        return queryset.annotate(
+            alerted_count=Count("notifications"),
+            accepted_count=Count("notifications", filter=Q(notifications__status=n.ACCEPTED)),
+            pending_count=Count("notifications", filter=Q(notifications__status=n.PENDING)),
+            declined_count=Count("notifications", filter=Q(notifications__status=n.DECLINED)),
+            expired_count=Count("notifications", filter=Q(notifications__status=n.EXPIRED)),
+        # "critical" sorts before "standard", so ascending puts urgent first.
+        ).order_by("urgency_level", "-created_at")[:50]
+
+
+class RecentDonationsView(generics.ListAPIView):
+    """The 20 most recent donations nationwide, for the KNBTS dashboard."""
+
+    serializer_class = DonationSerializer
+    permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
+
+    def get_queryset(self):
+        return Donation.objects.select_related("donor", "regional_storage_center")[:20]

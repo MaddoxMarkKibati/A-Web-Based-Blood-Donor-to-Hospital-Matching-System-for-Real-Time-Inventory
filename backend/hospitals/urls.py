@@ -13,6 +13,8 @@ from .views import (
     RequestResponsesView,
     ReserveThresholdListView,
     ReserveThresholdUpdateView,
+    RequestMonitorView,
+    RecentDonationsView,
 )
 
 urlpatterns = [
@@ -28,4 +30,6 @@ urlpatterns = [
     path("requests/<int:pk>/responses/", RequestResponsesView.as_view(), name="request-responses"),
     path("thresholds/", ReserveThresholdListView.as_view(), name="threshold-list"),
     path("thresholds/<int:pk>/", ReserveThresholdUpdateView.as_view(), name="threshold-detail"),
+    path("monitor/requests/", RequestMonitorView.as_view(), name="monitor-requests"),
+    path("monitor/donations/", RecentDonationsView.as_view(), name="monitor-donations"),
 ]
