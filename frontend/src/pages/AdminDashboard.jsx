@@ -6,6 +6,7 @@ import BloodTypeCorrection from "../components/BloodTypeCorrection";
 import { fetchRegionalStorageCenters } from "../api/hospitals";
 import { fetchAllInventory, recordDonation, fetchThresholds } from "../api/admin";
 import StockOverview from "../components/StockOverview";
+import ThresholdEditor from "../components/ThresholdEditor";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -88,6 +89,10 @@ export default function AdminDashboard() {
     }
   }
 
+  function handleThresholdUpdated(updated) {
+    setThresholds((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+  }
+
   const totalUnits = inventory.reduce((sum, i) => sum + i.units_available, 0);
 
   const filteredInventory = inventory.filter((i) => {
@@ -122,6 +127,7 @@ export default function AdminDashboard() {
         <p>Regional Storage Centers: {centers.length}</p>
       </section>
       <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
+      <ThresholdEditor thresholds={thresholds} onUpdated={handleThresholdUpdated} />
 
       <section>
         <h2>Filter by Blood Type / County</h2>
