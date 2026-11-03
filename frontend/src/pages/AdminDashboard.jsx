@@ -4,7 +4,8 @@ import ThemeToggle from "../components/ThemeToggle";
 import DonorSearch from "../components/DonorSearch";
 import BloodTypeCorrection from "../components/BloodTypeCorrection";
 import { fetchRegionalStorageCenters } from "../api/hospitals";
-import { fetchAllInventory, recordDonation } from "../api/admin";
+import { fetchAllInventory, recordDonation, fetchThresholds } from "../api/admin";
+import StockOverview from "../components/StockOverview";
 
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -12,6 +13,7 @@ export default function AdminDashboard() {
   const { logout } = useAuth();
   const [centers, setCenters] = useState([]);
   const [inventory, setInventory] = useState([]);
+  const [thresholds, setThresholds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -30,10 +32,11 @@ export default function AdminDashboard() {
 
   function loadData() {
     setLoading(true);
-    Promise.all([fetchRegionalStorageCenters(), fetchAllInventory()])
-      .then(([c, i]) => {
+    Promise.all([fetchRegionalStorageCenters(), fetchAllInventory(), fetchThresholds()])
+      .then(([c, i, t]) => {
         setCenters(c);
         setInventory(i);
+        setThresholds(t);
         if (c.length > 0) {
           setForm((f) => ({
             ...f,
@@ -118,6 +121,7 @@ export default function AdminDashboard() {
         <p>Total Units Nationwide: {totalUnits}</p>
         <p>Regional Storage Centers: {centers.length}</p>
       </section>
+      <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
 
       <section>
         <h2>Filter by Blood Type / County</h2>

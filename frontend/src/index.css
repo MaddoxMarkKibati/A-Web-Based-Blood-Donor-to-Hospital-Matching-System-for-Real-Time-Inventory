@@ -334,3 +334,19 @@ label {
 .location-picker-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
 .location-picker-controls input { flex: 1 1 220px; }
 .location-picker .leaflet-container { border-radius: var(--radius); }
+
+.stock-bars { display: grid; gap: 0.5rem; }
+.stock-bar-row { display: grid; grid-template-columns: 3rem 1fr minmax(11rem, auto); align-items: center; gap: 0.75rem; }
+.stock-bar-label { font-weight: 700; }
+.stock-bar-track { position: relative; height: 0.9rem; background: rgba(128, 128, 128, 0.2); border-radius: 999px; overflow: hidden; }
+.stock-bar-fill { height: 100%; border-radius: 999px; }
+.stock-bar-fill.level-ok { background: var(--color-success, #2e8b57); }
+.stock-bar-fill.level-low { background: var(--color-warning, #d98e04); }
+.stock-bar-fill.level-critical { background: var(--color-blood, #f5333f); }
+.stock-bar-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: currentColor; opacity: 0.7; }
+.stock-bar-value { font-size: 0.9rem; }
+.stock-matrix-wrap { overflow-x: auto; }
+.stock-matrix { border-collapse: collapse; width: 100%; }
+.stock-matrix th, .stock-matrix td { padding: 0.4rem 0.6rem; text-align: center; border: 1px solid rgba(128, 128, 128, 0.3); }
+.stock-matrix tbody th { text-align: left; }
+.stock-cell-empty { color: var(--color-blood, #f5333f); font-weight: 700; }
