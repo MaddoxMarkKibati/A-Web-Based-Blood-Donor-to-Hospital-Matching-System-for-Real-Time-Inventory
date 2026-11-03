@@ -376,3 +376,21 @@ label {
 .monitor-table { border-collapse: collapse; width: 100%; }
 .monitor-table th, .monitor-table td { padding: 0.4rem 0.6rem; text-align: left; border: 1px solid rgba(128, 128, 128, 0.3); white-space: nowrap; }
 .monitor-covered { font-weight: 700; color: var(--color-success, #2e8b57); }
+
+.blood-tag {
+  display: inline-flex;
+  align-items: baseline;
+  padding: 0.05em 0.45em;
+  border: 1.5px solid currentColor;
+  border-radius: var(--radius);
+  color: var(--color-blood);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+.blood-tag-rh { font-size: 0.7em; line-height: 0; margin-left: 1px; }
+.blood-tag-sm { font-size: 0.85rem; }
+.blood-tag-md { font-size: 1rem; }
+.blood-tag-lg { font-size: 1.75rem; padding: 0.05em 0.5em; }
+.blood-tag-empty { color: var(--color-text-muted); border-style: dashed; font-weight: 400; font-size: 0.85rem; }

@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
 import PushToggle from "../components/PushToggle";
 import LocationPicker from "../components/LocationPicker";
+import BloodTypeTag from "../components/BloodTypeTag";
 import {
   fetchMyProfile,
   updateMyProfile,
@@ -321,7 +322,7 @@ export default function DonorDashboard() {
                   <span className={`badge ${n.urgency_level === "critical" ? "badge-critical" : "badge-standard"}`}>
                     {n.urgency_level}
                   </span>{" "}
-                  {n.blood_type} x{n.units_needed} at {n.regional_storage_center_name}
+                  <BloodTypeTag type={n.blood_type} size="sm" /> x{n.units_needed} at {n.regional_storage_center_name}
                   {n.distance_km != null && ` (about ${n.distance_km} km from your nearest saved location)`}
                 </>
               ) : (
