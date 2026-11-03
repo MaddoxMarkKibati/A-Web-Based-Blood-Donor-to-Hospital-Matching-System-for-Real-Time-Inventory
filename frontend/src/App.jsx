@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { HOME } from "./navigation";
+import AppShell from "./components/AppShell";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import HomePage from "./pages/HomePage";
 import DonorDashboard from "./pages/DonorDashboard";
 import HospitalDashboard from "./pages/HospitalDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -14,12 +15,19 @@ function PrivateRoute({ children }) {
   return children;
 }
 
-function RoleDashboard() {
+// Sends a signed-in person to the home page for their role.
+function HomeRedirect() {
   const { user } = useAuth();
-  if (user.role === "donor") return <DonorDashboard />;
-  if (user.role === "hospital_staff") return <HospitalDashboard />;
-  if (user.role === "knbts_admin") return <AdminDashboard />;
-  return <p>Dashboard for role "{user.role}" is not built yet.</p>;
+  return <Navigate to={HOME[user.role] || "/login"} replace />;
+}
+
+// Keeps each role out of the other roles' pages.
+function RequireRole({ role, children }) {
+  const { user } = useAuth();
+  if (user.role !== role) {
+    return <Navigate to={HOME[user.role] || "/login"} replace />;
+  }
+  return children;
 }
 
 function App() {
@@ -32,10 +40,43 @@ function App() {
           path="/"
           element={
             <PrivateRoute>
-              <RoleDashboard />
+              <HomeRedirect />
             </PrivateRoute>
           }
         />
+        <Route
+          element={
+            <PrivateRoute>
+              <AppShell />
+            </PrivateRoute>
+          }
+        >
+          <Route
+            path="/donor"
+            element={
+              <RequireRole role="donor">
+                <DonorDashboard />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/hospital"
+            element={
+              <RequireRole role="hospital_staff">
+                <HospitalDashboard />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireRole role="knbts_admin">
+                <AdminDashboard />
+              </RequireRole>
+            }
+          />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

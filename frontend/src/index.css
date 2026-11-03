@@ -394,3 +394,101 @@ label {
 .blood-tag-md { font-size: 1rem; }
 .blood-tag-lg { font-size: 1.75rem; padding: 0.05em 0.5em; }
 .blood-tag-empty { color: var(--color-text-muted); border-style: dashed; font-weight: 400; font-size: 0.85rem; }
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 15rem 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "top top" "side main";
+}
+
+.shell-top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-primary);
+  color: #ffffff;
+}
+:root[data-theme="dark"] .shell-top { background: var(--color-primary-dark); }
+
+.shell-brand {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.shell-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.shell-user { font-size: 0.9rem; }
+.shell-top button {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  padding: 0.4em 1em;
+}
+
+.shell-side {
+  grid-area: side;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: 1.25rem 0;
+}
+.shell-role {
+  margin: 0 0 0.75rem;
+  padding: 0 1.25rem 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.shell-nav { display: flex; flex-direction: column; }
+.shell-nav a {
+  padding: 0.65rem 1.25rem;
+  color: var(--color-text);
+  text-decoration: none;
+  border-left: 4px solid transparent;
+}
+.shell-nav a:hover { background: var(--color-surface-raised); }
+.shell-nav a.active {
+  border-left-color: var(--color-primary);
+  background: var(--color-surface-raised);
+  font-weight: 600;
+}
+.shell-nav a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+.shell-main { grid-area: main; min-width: 0; }
+
+/* Until each page is rebuilt, hide the old dashboard header inside the shell. */
+.shell-main .dashboard > header { display: none; }
+.shell-main .dashboard { max-width: 1000px; margin: 0; padding-top: 1.5rem; }
+
+@media (max-width: 800px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas: "top" "main";
+  }
+  .shell-side {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    padding: 0;
+    border-right: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .shell-role { display: none; }
+  .shell-nav { flex-direction: row; }
+  .shell-nav a {
+    flex: 1;
+    text-align: center;
+    padding: 0.8rem 0.25rem;
+    font-size: 0.85rem;
+    border-left: 0;
+    border-top: 3px solid transparent;
+  }
+  .shell-nav a.active { border-top-color: var(--color-primary); }
+  .shell-main { padding-bottom: 4rem; }
+}
