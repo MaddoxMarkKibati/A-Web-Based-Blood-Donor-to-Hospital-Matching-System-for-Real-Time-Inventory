@@ -46,6 +46,32 @@ class BloodRequestSerializer(serializers.ModelSerializer):
             "urgency_level", "status", "created_at",
         ]
         read_only_fields = ["id", "staff", "created_at"]
+        
+    def validate_units_needed(self, value):
+        if value < 1:
+            raise serializers.ValidationError("Request at least 1 unit.")
+        return value
+
+    def validate(self, attrs):
+        if self.instance is None:
+            # A new request always starts as pending.
+            attrs["status"] = BloodRequest.Status.PENDING
+            return attrs
+
+        if not attrs:
+            return attrs
+        if set(attrs) != {"status"}:
+            raise serializers.ValidationError("Only the status of a request can be changed.")
+        if self.instance.status != BloodRequest.Status.PENDING:
+            raise serializers.ValidationError(
+                f"This request is already {self.instance.status} and cannot be changed."
+            )
+        if attrs["status"] not in (
+            BloodRequest.Status.FULFILLED,
+            BloodRequest.Status.CANCELLED,
+        ):
+            raise serializers.ValidationError("A request can only be marked fulfilled or cancelled.")
+        return attrs
 
 class ReserveThresholdSerializer(serializers.ModelSerializer):
     class Meta:
