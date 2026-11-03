@@ -9,6 +9,7 @@ import HospitalDashboard from "./pages/HospitalDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import DonorHome from "./pages/donor/DonorHome";
 import DonorAlerts from "./pages/donor/DonorAlerts";
+import DonorLocations from "./pages/donor/DonorLocations";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -66,6 +67,14 @@ function App() {
             element={
               <RequireRole role="donor">
                 <DonorAlerts />
+              </RequireRole>
+            }
+          />
+                    <Route
+            path="/donor/locations"
+            element={
+              <RequireRole role="donor">
+                <DonorLocations />
               </RequireRole>
             }
           />
