@@ -668,3 +668,5 @@ label {
   margin-right: 0.4rem;
   vertical-align: middle;
 }
+
+.settings-stack > * + * { margin-top: 2rem; }

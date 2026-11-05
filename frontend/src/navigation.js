@@ -29,6 +29,7 @@ export const NAV = {
     { to: "/admin", label: "Overview", end: true },
     { to: "/admin/requests", label: "Requests", end: true },
     { to: "/admin/donations", label: "Donations", end: true },
+    { to: "/admin/settings", label: "Settings", end: true },
     { to: "/admin/classic", label: "Full dashboard (temporary)", end: true },
   ],
 };
