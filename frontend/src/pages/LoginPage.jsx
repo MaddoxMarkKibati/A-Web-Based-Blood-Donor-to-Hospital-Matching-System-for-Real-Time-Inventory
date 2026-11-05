@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import ThemeToggle from "../components/ThemeToggle";
+import AuthLayout from "../components/AuthLayout";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -26,16 +26,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-page">
+    <AuthLayout title="Log in" subtitle="Use the email you registered with.">
       <form onSubmit={handleSubmit} className="auth-form">
-        <h1>Log In</h1>
-
         {error && <p className="auth-error">{error}</p>}
 
         <label htmlFor="email">Email</label>
         <input
           id="email"
           type="email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -45,20 +44,20 @@ export default function LoginPage() {
         <input
           id="password"
           type="password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Logging in..." : "Log In"}
+        <button type="submit" className="btn-primary" disabled={submitting}>
+          {submitting ? "Logging in..." : "Log in"}
         </button>
 
         <p>
           No account? <Link to="/register">Register</Link>
         </p>
-        <ThemeToggle />
       </form>
-    </div>
+    </AuthLayout>
   );
 }
