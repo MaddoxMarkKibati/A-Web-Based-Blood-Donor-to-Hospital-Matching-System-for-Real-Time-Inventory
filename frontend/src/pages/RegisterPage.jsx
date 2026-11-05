@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../api/auth";
+import AuthLayout from "../components/AuthLayout";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -18,7 +19,14 @@ export default function RegisterPage() {
     setError("");
     setSubmitting(true);
     try {
-      await registerUser({ email, password, role, first_name: firstName, middle_names: middleNames, last_name: lastName });
+      await registerUser({
+        email,
+        password,
+        role,
+        first_name: firstName,
+        middle_names: middleNames,
+        last_name: lastName,
+      });
       navigate("/login");
     } catch (err) {
       setError(err.message || "Registration failed");
@@ -28,38 +36,45 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="auth-page">
+    <AuthLayout title="Create an account" subtitle="Register as a blood donor or as hospital staff.">
       <form onSubmit={handleSubmit} className="auth-form">
-        <h1>Register</h1>
-
         {error && <p className="auth-error">{error}</p>}
-                <label htmlFor="first_name">First Name</label>
-        <input
-          id="first_name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-        />
 
-        <label htmlFor="middle_names">Middle Name(s) (optional)</label>
+        <div className="auth-row">
+          <div>
+            <label htmlFor="first_name">First name</label>
+            <input
+              id="first_name"
+              autoComplete="given-name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="last_name">Last name</label>
+            <input
+              id="last_name"
+              autoComplete="family-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        <label htmlFor="middle_names">Middle name(s) (optional)</label>
         <input
           id="middle_names"
           value={middleNames}
           onChange={(e) => setMiddleNames(e.target.value)}
         />
 
-        <label htmlFor="last_name">Last Name</label>
-        <input
-          id="last_name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-        />
-        
         <label htmlFor="email">Email</label>
         <input
           id="email"
           type="email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -69,19 +84,21 @@ export default function RegisterPage() {
         <input
           id="password"
           type="password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={8}
           required
         />
+        <p className="auth-hint">At least 8 characters.</p>
 
         <label htmlFor="role">I am a</label>
         <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="donor">Blood Donor</option>
-          <option value="hospital_staff">Hospital Staff</option>
+          <option value="donor">Blood donor</option>
+          <option value="hospital_staff">Hospital staff</option>
         </select>
 
-        <button type="submit" disabled={submitting}>
+        <button type="submit" className="btn-primary" disabled={submitting}>
           {submitting ? "Registering..." : "Register"}
         </button>
 
@@ -89,6 +106,6 @@ export default function RegisterPage() {
           Already have an account? <Link to="/login">Log in</Link>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
