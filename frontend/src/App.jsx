@@ -4,7 +4,6 @@ import { HOME } from "./navigation";
 import AppShell from "./components/AppShell";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import AdminDashboard from "./pages/AdminDashboard";
 import DonorHome from "./pages/donor/DonorHome";
 import DonorAlerts from "./pages/donor/DonorAlerts";
 import DonorLocations from "./pages/donor/DonorLocations";
@@ -154,14 +153,6 @@ function App() {
             element={
               <RequireRole role="knbts_admin">
                 <AdminSettings />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/admin/classic"
-            element={
-              <RequireRole role="knbts_admin">
-                <AdminDashboard />
               </RequireRole>
             }
           />
