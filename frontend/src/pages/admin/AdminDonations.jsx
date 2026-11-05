@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import RecordDonationForm from "../../components/RecordDonationForm";
 import RecentDonations from "../../components/RecentDonations";
 import { fetchRegionalStorageCenters } from "../../api/hospitals";
+import Skeleton from "../../components/Skeleton";
 
 export default function AdminDonations() {
   const [centers, setCenters] = useState([]);
@@ -24,7 +25,7 @@ export default function AdminDonations() {
         stock, and the donor becomes ineligible for alerts until their next eligible date.
       </p>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && centers.length > 0 && (
         <RecordDonationForm centers={centers} onRecorded={() => setVersion((v) => v + 1)} />
       )}

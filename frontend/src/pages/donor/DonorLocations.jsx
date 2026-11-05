@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import LocationPicker from "../../components/LocationPicker";
 import { fetchMyLocations, createLocation, deleteLocation } from "../../api/donors";
+import Skeleton from "../../components/Skeleton";
 
 const MAX_FREQUENT = 2;
 const MAX_LIVE = 1;
@@ -91,7 +92,7 @@ export default function DonorLocations() {
       {message && <p className="auth-success">{message}</p>}
 
       <h2>Saved places</h2>
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && locations.length === 0 && (
         <p>No saved places yet. Add one below so hospitals near you can find you.</p>
       )}

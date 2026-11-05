@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BloodTypeTag from "../../components/BloodTypeTag";
 import { fetchMyProfile, fetchMyNotifications, fetchMyLocations } from "../../api/donors";
+import Skeleton from "../../components/Skeleton";
 
 export default function DonorHome() {
   const [profile, setProfile] = useState(null);
@@ -21,7 +22,7 @@ export default function DonorHome() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="page"><p>Loading...</p></div>;
+  if (loading) return <div className="page"><Skeleton /></div>;
   if (error) return <div className="page"><p className="auth-error">{error}</p></div>;
 
   const openAlerts = alerts.filter(

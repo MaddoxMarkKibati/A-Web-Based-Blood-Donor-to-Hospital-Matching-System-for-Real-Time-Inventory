@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BloodTypeTag from "./BloodTypeTag";
 import { fetchRequestResponses, updateRequestStatus } from "../api/hospitals";
+import Skeleton from "./Skeleton";
 
 const STATUS_LABEL = {
   pending: "Pending",
@@ -103,7 +104,7 @@ export default function RequestCard({ request, centerName, onChanged }) {
 
       {open && (
         <div className="req-responders">
-          {loading && <p>Loading...</p>}
+          {loading && <Skeleton lines={2} />}
           {!loading && responses && responses.length === 0 && <p>No donors were alerted for this request.</p>}
           {!loading && responses && responses.length > 0 && (
             <ul>

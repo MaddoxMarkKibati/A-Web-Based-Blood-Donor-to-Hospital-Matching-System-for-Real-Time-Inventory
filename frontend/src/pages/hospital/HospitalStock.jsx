@@ -5,6 +5,7 @@ import {
   fetchInventory,
   fetchReserveThresholds,
 } from "../../api/hospitals";
+import Skeleton from "../../components/Skeleton";
 
 export default function HospitalStock() {
   const [centers, setCenters] = useState([]);
@@ -31,7 +32,7 @@ export default function HospitalStock() {
         centres, not the stock of a single hospital. Reserve minimums are set by KNBTS.
       </p>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && !error && (
         <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
       )}

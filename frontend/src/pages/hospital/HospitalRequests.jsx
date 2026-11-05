@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import NewRequestForm from "../../components/NewRequestForm";
 import RequestCard from "../../components/RequestCard";
 import { fetchRegionalStorageCenters, fetchMyRequests } from "../../api/hospitals";
+import Skeleton from "../../components/Skeleton";
 
 export default function HospitalRequests() {
   const [centers, setCenters] = useState([]);
@@ -30,7 +31,7 @@ export default function HospitalRequests() {
     <div className="page">
       <h1>Requests</h1>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
 
       {!loading && centers.length > 0 && <NewRequestForm centers={centers} onCreated={loadRequests} />}
 

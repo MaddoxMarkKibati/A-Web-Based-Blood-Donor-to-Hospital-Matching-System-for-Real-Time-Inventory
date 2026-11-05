@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchRecentDonations } from "../api/admin";
+import Skeleton from "./Skeleton";
 
 function formatWhen(iso) {
   return new Date(iso).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" });
@@ -33,7 +34,7 @@ export default function RecentDonations({ refreshKey }) {
     <section>
       <h2>Recent Donations</h2>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton lines={3} />}
       {!loading && !error && donations.length === 0 && <p>No donations recorded yet.</p>}
 
       {donations.length > 0 && (

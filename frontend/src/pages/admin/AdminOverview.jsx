@@ -4,6 +4,7 @@ import { fetchRegionalStorageCenters } from "../../api/hospitals";
 import { fetchAllInventory, fetchThresholds, fetchRequestMonitor } from "../../api/admin";
 import { BLOOD_TYPES, stockLevel } from "../../utils/stock";
 import CoverageMap from "../../components/CoverageMap";
+import Skeleton from "../../components/Skeleton";
 
 function plural(n, one, many) {
   return `${n} ${n === 1 ? one : many}`;
@@ -66,7 +67,7 @@ export default function AdminOverview() {
     <div className="page">
       <h1>Overview</h1>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && !error && (
         <>
           <p className="status-line">{buildStatus(centers, inventory, thresholds, pending)}</p>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import BloodTypeTag from "../../components/BloodTypeTag";
 import PushToggle from "../../components/PushToggle";
 import { fetchMyNotifications, respondToNotification } from "../../api/donors";
+import Skeleton from "../../components/Skeleton";
 
 function isOpen(alert) {
   return alert.status === "pending" && (!alert.request_status || alert.request_status === "pending");
@@ -100,7 +101,7 @@ export default function DonorAlerts() {
       <PushToggle />
 
       <h2>Open</h2>
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && open.length === 0 && (
         <p>No open alerts. When a hospital near you needs your blood type, it appears here.</p>
       )}

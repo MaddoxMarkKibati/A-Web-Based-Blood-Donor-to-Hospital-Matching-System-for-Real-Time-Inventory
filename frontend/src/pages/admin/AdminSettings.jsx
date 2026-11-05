@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ThresholdEditor from "../../components/ThresholdEditor";
 import BloodTypeCorrection from "../../components/BloodTypeCorrection";
 import { fetchThresholds } from "../../api/admin";
+import Skeleton from "../../components/Skeleton";
 
 export default function AdminSettings() {
   const [thresholds, setThresholds] = useState([]);
@@ -23,7 +24,7 @@ export default function AdminSettings() {
     <div className="page">
       <h1>Settings</h1>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && !error && (
         <div className="settings-stack">
           <div className="page-panel request-form">

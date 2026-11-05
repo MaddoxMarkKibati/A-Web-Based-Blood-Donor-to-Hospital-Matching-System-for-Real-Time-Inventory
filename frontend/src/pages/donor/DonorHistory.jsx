@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import BloodTypeTag from "../../components/BloodTypeTag";
 import { fetchMyDonations } from "../../api/donors";
+import Skeleton from "../../components/Skeleton";
 
 export default function DonorHistory() {
   const [donations, setDonations] = useState([]);
@@ -20,7 +21,7 @@ export default function DonorHistory() {
     <div className="page">
       <h1>Donation history</h1>
       {error && <p className="auth-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && !error && donations.length === 0 && (
         <p>No donations recorded yet. After you donate at a KNBTS centre, it appears here.</p>
       )}

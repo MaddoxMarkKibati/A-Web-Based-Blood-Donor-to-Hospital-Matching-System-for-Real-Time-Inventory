@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import BloodTypeTag from "../../components/BloodTypeTag";
 import { BLOOD_TYPES } from "../../utils/stock";
 import { fetchMyProfile, updateMyProfile } from "../../api/donors";
+import Skeleton from "../../components/Skeleton";
 
 const GENDERS = [
   { value: "M", label: "Male" },
@@ -58,7 +59,7 @@ export default function DonorProfile() {
     }
   }
 
-  if (loading) return <div className="page"><p>Loading...</p></div>;
+  if (loading) return <div className="page"><Skeleton /></div>;
   if (!profile) return <div className="page"><p className="auth-error">{error}</p></div>;
 
   return (
