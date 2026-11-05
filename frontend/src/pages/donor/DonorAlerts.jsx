@@ -1,3 +1,4 @@
+import EmptyState from "../../components/EmptyState";
 import { useEffect, useState } from "react";
 import BloodTypeTag from "../../components/BloodTypeTag";
 import PushToggle from "../../components/PushToggle";
@@ -103,7 +104,10 @@ export default function DonorAlerts() {
       <h2>Open</h2>
       {loading && <Skeleton />}
       {!loading && open.length === 0 && (
-        <p>No open alerts. When a hospital near you needs your blood type, it appears here.</p>
+        <EmptyState title="No open alerts" actionTo="/donor/profile" actionLabel="Check your profile">
+          When a hospital near you needs your blood type, it appears here. Alerts only reach
+          you once your profile is complete.
+        </EmptyState>
       )}
       <div className="alert-list">
         {open.map((a) => (

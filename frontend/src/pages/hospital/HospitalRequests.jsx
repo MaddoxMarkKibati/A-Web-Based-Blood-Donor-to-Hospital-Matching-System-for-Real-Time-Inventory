@@ -1,3 +1,4 @@
+import EmptyState from "../../components/EmptyState";
 import { useCallback, useEffect, useState } from "react";
 import NewRequestForm from "../../components/NewRequestForm";
 import RequestCard from "../../components/RequestCard";
@@ -39,7 +40,9 @@ export default function HospitalRequests() {
         <section>
           <h2>Your requests</h2>
           {requests.length === 0 ? (
-            <p>You have not posted any requests yet. Use the form above to post your first one.</p>
+            <EmptyState title="No requests yet">
+              Use the form above to post your first one.
+            </EmptyState>
           ) : (
             requests.map((r) => (
               <RequestCard

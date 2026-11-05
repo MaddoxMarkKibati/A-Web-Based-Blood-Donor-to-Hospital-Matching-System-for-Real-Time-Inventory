@@ -1,3 +1,4 @@
+import EmptyState from "../../components/EmptyState";
 import { useEffect, useState } from "react";
 import LocationPicker from "../../components/LocationPicker";
 import { fetchMyLocations, createLocation, deleteLocation } from "../../api/donors";
@@ -94,7 +95,9 @@ export default function DonorLocations() {
       <h2>Saved places</h2>
       {loading && <Skeleton />}
       {!loading && locations.length === 0 && (
-        <p>No saved places yet. Add one below so hospitals near you can find you.</p>
+        <EmptyState title="No saved places yet">
+          Add one below so hospitals near you can find you.
+        </EmptyState>
       )}
       <p className="location-usage">
         Frequent: {frequentCount} of {MAX_FREQUENT}. Live: {liveCount} of {MAX_LIVE}.

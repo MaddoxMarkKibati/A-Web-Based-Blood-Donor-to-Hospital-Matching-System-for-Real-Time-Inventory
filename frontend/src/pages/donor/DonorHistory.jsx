@@ -1,3 +1,4 @@
+import EmptyState from "../../components/EmptyState";
 import { useEffect, useState } from "react";
 import BloodTypeTag from "../../components/BloodTypeTag";
 import { fetchMyDonations } from "../../api/donors";
@@ -23,7 +24,9 @@ export default function DonorHistory() {
       {error && <p className="auth-error">{error}</p>}
       {loading && <Skeleton />}
       {!loading && !error && donations.length === 0 && (
-        <p>No donations recorded yet. After you donate at a KNBTS centre, it appears here.</p>
+        <EmptyState title="No donations yet">
+          After you donate at a KNBTS centre, it appears here.
+        </EmptyState>
       )}
 
       {donations.length > 0 && (

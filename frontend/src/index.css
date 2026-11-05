@@ -750,3 +750,13 @@ label {
 @media (prefers-reduced-motion: reduce) {
   .skeleton-line { animation: none; opacity: 0.6; }
 }
+
+.empty-state {
+  max-width: 40rem;
+  padding: 1.25rem 1.5rem;
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+.empty-title { margin: 0; font-weight: 600; }
+.empty-text { margin: 0.35rem 0 0; color: var(--color-text-muted); }
+.empty-action { display: inline-block; margin-top: 0.75rem; font-weight: 600; }

@@ -1,3 +1,4 @@
+import EmptyState from "./EmptyState";
 import { useEffect, useState } from "react";
 import { fetchRecentDonations } from "../api/admin";
 import Skeleton from "./Skeleton";
@@ -35,7 +36,7 @@ export default function RecentDonations({ refreshKey }) {
       <h2>Recent Donations</h2>
       {error && <p className="auth-error">{error}</p>}
       {loading && <Skeleton lines={3} />}
-      {!loading && !error && donations.length === 0 && <p>No donations recorded yet.</p>}
+      {!loading && !error && donations.length === 0 && <EmptyState title="No donations recorded yet">Recorded donations appear here.</EmptyState>}
 
       {donations.length > 0 && (
         <div className="monitor-wrap">

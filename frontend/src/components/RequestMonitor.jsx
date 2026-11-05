@@ -1,3 +1,4 @@
+import EmptyState from "./EmptyState";
 import { useEffect, useState } from "react";
 import { fetchRequestMonitor } from "../api/admin";
 
@@ -49,7 +50,7 @@ export default function RequestMonitor() {
       </div>
 
       {error && <p className="auth-error">{error}</p>}
-      {!loading && !error && requests.length === 0 && <p>No requests to show.</p>}
+      {!loading && !error && requests.length === 0 && <EmptyState title="No requests to show">Requests appear here when hospital staff post them.</EmptyState>}
 
       {requests.length > 0 && (
         <div className="monitor-wrap">
