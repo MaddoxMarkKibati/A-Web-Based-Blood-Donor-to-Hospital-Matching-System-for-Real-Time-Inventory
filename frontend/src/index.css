@@ -612,3 +612,31 @@ label {
 }
 .segmented button[aria-checked="true"] { background: var(--color-text); color: var(--color-bg); }
 .segmented button.is-critical[aria-checked="true"] { background: var(--color-critical); color: #ffffff; }
+
+.req-card { max-width: 40rem; margin-bottom: 1rem; }
+.req-card-head { display: flex; align-items: center; gap: 0.9rem; }
+.req-card-main { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.req-card-meta { color: var(--color-text-muted); font-size: 0.85rem; }
+.req-card-badges { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+.req-card-counts { margin: 0.75rem 0; }
+.req-card-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.req-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+}
+.req-status-pending { color: var(--color-amber, #8a5a00); border-color: currentColor; }
+.req-status-fulfilled { color: var(--color-green, #1d7a46); border-color: currentColor; }
+.req-status-cancelled { color: var(--color-text-muted); }
+
+.req-responders { margin-top: 0.9rem; border-top: 1px solid var(--color-border); padding-top: 0.6rem; }
+.req-responders ul { list-style: none; margin: 0; padding: 0; }
+.req-responders li { display: flex; align-items: center; gap: 0.7rem; padding: 0.4rem 0; }
+.req-responders li > span:first-child { flex: 1; min-width: 0; }
+.resp-status { font-size: 0.85rem; font-weight: 600; }
+.resp-accepted { color: var(--color-green, #1d7a46); }
+.resp-pending { color: var(--color-amber, #8a5a00); }
+.resp-declined, .resp-expired { color: var(--color-text-muted); }
