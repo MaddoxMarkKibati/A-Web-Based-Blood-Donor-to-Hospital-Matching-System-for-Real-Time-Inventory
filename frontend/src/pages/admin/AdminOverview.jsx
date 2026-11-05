@@ -3,6 +3,7 @@ import StockOverview from "../../components/StockOverview";
 import { fetchRegionalStorageCenters } from "../../api/hospitals";
 import { fetchAllInventory, fetchThresholds, fetchRequestMonitor } from "../../api/admin";
 import { BLOOD_TYPES, stockLevel } from "../../utils/stock";
+import CoverageMap from "../../components/CoverageMap";
 
 function plural(n, one, many) {
   return `${n} ${n === 1 ? one : many}`;
@@ -69,6 +70,7 @@ export default function AdminOverview() {
       {!loading && !error && (
         <>
           <p className="status-line">{buildStatus(centers, inventory, thresholds, pending)}</p>
+          <CoverageMap centers={centers} inventory={inventory} thresholds={thresholds} />
           <StockOverview centers={centers} inventory={inventory} thresholds={thresholds} />
         </>
       )}
