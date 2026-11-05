@@ -4,7 +4,6 @@ import { HOME } from "./navigation";
 import AppShell from "./components/AppShell";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import HospitalDashboard from "./pages/HospitalDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import DonorHome from "./pages/donor/DonorHome";
 import DonorAlerts from "./pages/donor/DonorAlerts";
@@ -119,14 +118,6 @@ function App() {
             element={
               <RequireRole role="hospital_staff">
                 <HospitalCorrections />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/hospital/classic"
-            element={
-              <RequireRole role="hospital_staff">
-                <HospitalDashboard />
               </RequireRole>
             }
           />

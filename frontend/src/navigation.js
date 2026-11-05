@@ -24,7 +24,6 @@ export const NAV = {
     { to: "/hospital", label: "Requests", end: true },
     { to: "/hospital/stock", label: "Stock", end: true },
     { to: "/hospital/corrections", label: "Blood type corrections", end: true },
-    { to: "/hospital/classic", label: "Full dashboard (temporary)", end: true },
   ],
   knbts_admin: [{ to: "/admin", label: "Overview", end: true }],
 };
