@@ -12,6 +12,7 @@ import DonorLocations from "./pages/donor/DonorLocations";
 import DonorHistory from "./pages/donor/DonorHistory";
 import DonorProfile from "./pages/donor/DonorProfile";
 import HospitalRequests from "./pages/hospital/HospitalRequests";
+import HospitalStock from "./pages/hospital/HospitalStock";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -101,6 +102,14 @@ function App() {
             element={
               <RequireRole role="hospital_staff">
                 <HospitalRequests />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/hospital/stock"
+            element={
+              <RequireRole role="hospital_staff">
+                <HospitalStock />
               </RequireRole>
             }
           />
