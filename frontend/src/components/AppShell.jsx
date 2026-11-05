@@ -23,11 +23,15 @@ export default function AppShell() {
       <aside className="shell-side">
         <p className="shell-role">{ROLE_LABEL[user.role] || user.role}</p>
         <nav className="shell-nav" aria-label="Main">
-          {items.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end}>
-              {item.label}
-            </NavLink>
-          ))}
+          {items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink key={item.to} to={item.to} end={item.end}>
+                {Icon && <Icon size={18} aria-hidden="true" />}
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
       </aside>
 

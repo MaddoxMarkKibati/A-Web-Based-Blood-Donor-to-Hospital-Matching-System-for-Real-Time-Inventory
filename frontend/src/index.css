@@ -760,3 +760,20 @@ label {
 .empty-title { margin: 0; font-weight: 600; }
 .empty-text { margin: 0.35rem 0 0; color: var(--color-text-muted); }
 .empty-action { display: inline-block; margin-top: 0.75rem; font-weight: 600; }
+
+.shell-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.shell-nav a svg { flex-shrink: 0; }
+
+@media (max-width: 800px) {
+  .shell-nav a {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+}

@@ -1,3 +1,17 @@
+import {
+  House,
+  Bell,
+  MapPin,
+  History,
+  User,
+  ClipboardList,
+  Droplets,
+  Droplet,
+  Pencil,
+  LayoutDashboard,
+  Settings,
+} from "lucide-react";
+
 // Where each role lands after signing in.
 export const HOME = {
   donor: "/donor",
@@ -11,24 +25,24 @@ export const ROLE_LABEL = {
   knbts_admin: "KNBTS administrator",
 };
 
-// Sidebar items per role. Later steps add pages here as they are built.
+// Sidebar items per role.
 export const NAV = {
   donor: [
-    { to: "/donor", label: "Home", end: true },
-    { to: "/donor/alerts", label: "Alerts", end: true },
-    { to: "/donor/locations", label: "My locations", end: true },
-    { to: "/donor/history", label: "Donation history", end: true },
-    { to: "/donor/profile", label: "Profile", end: true },
+    { to: "/donor", label: "Home", icon: House, end: true },
+    { to: "/donor/alerts", label: "Alerts", icon: Bell, end: true },
+    { to: "/donor/locations", label: "My locations", icon: MapPin, end: true },
+    { to: "/donor/history", label: "Donation history", icon: History, end: true },
+    { to: "/donor/profile", label: "Profile", icon: User, end: true },
   ],
   hospital_staff: [
-    { to: "/hospital", label: "Requests", end: true },
-    { to: "/hospital/stock", label: "Stock", end: true },
-    { to: "/hospital/corrections", label: "Blood type corrections", end: true },
+    { to: "/hospital", label: "Requests", icon: ClipboardList, end: true },
+    { to: "/hospital/stock", label: "Stock", icon: Droplets, end: true },
+    { to: "/hospital/corrections", label: "Blood type corrections", icon: Pencil, end: true },
   ],
   knbts_admin: [
-    { to: "/admin", label: "Overview", end: true },
-    { to: "/admin/requests", label: "Requests", end: true },
-    { to: "/admin/donations", label: "Donations", end: true },
-    { to: "/admin/settings", label: "Settings", end: true },
+    { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
+    { to: "/admin/requests", label: "Requests", icon: ClipboardList, end: true },
+    { to: "/admin/donations", label: "Donations", icon: Droplet, end: true },
+    { to: "/admin/settings", label: "Settings", icon: Settings, end: true },
   ],
 };
