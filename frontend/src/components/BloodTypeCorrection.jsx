@@ -1,8 +1,7 @@
 import { useState } from "react";
 import DonorSearch from "./DonorSearch";
+import BloodTypeSelector from "./BloodTypeSelector";
 import { correctDonorBloodType } from "../api/hospitals";
-
-const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 export default function BloodTypeCorrection() {
   const [selected, setSelected] = useState(null);
@@ -37,30 +36,26 @@ export default function BloodTypeCorrection() {
   }
 
   return (
-    <section>
-      <h2>Correct Donor Blood Type</h2>
+    <section className="page-panel request-form">
+      <h2>Correct a donor's blood type</h2>
       {error && <p className="auth-error">{error}</p>}
       {message && <p className="auth-success">{message}</p>}
 
       <DonorSearch selected={selected} onSelect={handleSelect} />
 
       {selected && (
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label htmlFor="correct_blood_type">New blood type</label>
-          <select
-            id="correct_blood_type"
-            value={newType}
-            onChange={(e) => setNewType(e.target.value)}
-            required
-          >
-            <option value="">Select...</option>
-            {BLOOD_TYPES.map((bt) => (
-              <option key={bt} value={bt}>{bt}</option>
-            ))}
-          </select>
-          <button type="submit" disabled={saving || newType === selected.blood_type}>
-            {saving ? "Saving..." : "Update"}
-          </button>
+        <form onSubmit={handleSubmit}>
+          <label>New blood type</label>
+          <BloodTypeSelector value={newType} onChange={setNewType} label="New blood type" />
+          <p>
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={saving || !newType || newType === selected.blood_type}
+            >
+              {saving ? "Saving..." : "Update blood type"}
+            </button>
+          </p>
         </form>
       )}
     </section>
