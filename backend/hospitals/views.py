@@ -260,7 +260,7 @@ class RecentDonationsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsKNBTSAdmin]
 
     def get_queryset(self):
-        return Donation.objects.select_related("donor", "regional_storage_center")[:20]
+        return Donation.objects.select_related("donor", "regional_storage_center", "hospital")[:20]
     
 class MyHospitalView(generics.RetrieveUpdateAPIView):
     """The logged-in staff member's hospital. Staff can read it and set its location."""

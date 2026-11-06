@@ -74,20 +74,34 @@ class DonorLocationSerializer(serializers.ModelSerializer):
 class DonationSerializer(serializers.ModelSerializer):
     donor_name = serializers.CharField(source="donor.full_name", read_only=True)
     regional_storage_center_name = serializers.CharField(
-        source="regional_storage_center.region_name", read_only=True
+        source="regional_storage_center.region_name", read_only=True, default=None
     )
+    hospital_name = serializers.CharField(source="hospital.name", read_only=True, default=None)
+    place_name = serializers.SerializerMethodField()
+    place_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Donation
         fields = [
             "id", "donor", "donor_name", "regional_storage_center",
-            "regional_storage_center_name", "blood_type", "units_donated",
+            "regional_storage_center_name", "hospital_name",
+            "place_name", "place_type", "blood_type", "units_donated",
             "donation_date",
         ]
         read_only_fields = ["id", "donation_date"]
         extra_kwargs = {
             "regional_storage_center": {"required": True, "allow_null": False},
         }
+
+    def get_place_name(self, obj):
+        if obj.hospital_id:
+            return obj.hospital.name
+        if obj.regional_storage_center_id:
+            return obj.regional_storage_center.region_name
+        return None
+
+    def get_place_type(self, obj):
+        return "hospital" if obj.hospital_id else "centre"
 
 class NotificationSerializer(serializers.ModelSerializer):
     blood_type = serializers.CharField(
