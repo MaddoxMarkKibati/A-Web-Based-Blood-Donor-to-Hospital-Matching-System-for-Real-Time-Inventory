@@ -54,6 +54,27 @@ class BloodInventory(models.Model):
     def __str__(self):
         return f"{self.regional_storage_center} — {self.blood_type}: {self.units_available}"
 
+class HospitalInventory(models.Model):
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE,
+        related_name="inventory",
+    )
+    blood_type = models.CharField(max_length=3, choices=BloodInventory.BLOOD_TYPE_CHOICES)
+    units_available = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["hospital", "blood_type"],
+                name="unique_inventory_per_hospital_blood_type",
+            )
+        ]
+        verbose_name_plural = "hospital inventory"
+
+    def __str__(self):
+        return f"{self.hospital} — {self.blood_type}: {self.units_available}"
 
 class BloodRequest(models.Model):
     BLOOD_TYPE_CHOICES = BloodInventory.BLOOD_TYPE_CHOICES

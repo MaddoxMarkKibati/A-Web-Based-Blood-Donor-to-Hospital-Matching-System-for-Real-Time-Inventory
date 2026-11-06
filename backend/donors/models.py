@@ -138,6 +138,22 @@ class Donation(models.Model):
         "hospitals.RegionalStorageCenter",
         on_delete=models.CASCADE,
         related_name="donations",
+        null=True,
+        blank=True,
+    )
+    hospital = models.ForeignKey(
+        "hospitals.Hospital",
+        on_delete=models.SET_NULL,
+        related_name="donations",
+        null=True,
+        blank=True,
+    )
+    blood_request = models.ForeignKey(
+        "hospitals.BloodRequest",
+        on_delete=models.SET_NULL,
+        related_name="donations",
+        null=True,
+        blank=True,
     )
     blood_type = models.CharField(max_length=3, choices=Donor.BLOOD_TYPE_CHOICES)
     units_donated = models.PositiveIntegerField(default=1)

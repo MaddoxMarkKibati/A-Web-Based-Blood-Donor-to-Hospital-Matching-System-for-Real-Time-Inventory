@@ -85,7 +85,9 @@ class DonationSerializer(serializers.ModelSerializer):
             "donation_date",
         ]
         read_only_fields = ["id", "donation_date"]
-
+        extra_kwargs = {
+            "regional_storage_center": {"required": True, "allow_null": False},
+        }
 
 class NotificationSerializer(serializers.ModelSerializer):
     blood_type = serializers.CharField(
