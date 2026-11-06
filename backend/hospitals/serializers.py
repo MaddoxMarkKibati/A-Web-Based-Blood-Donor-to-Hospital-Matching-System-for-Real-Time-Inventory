@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField
 
-from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest, ReserveThreshold
+from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodRequest, ReserveThreshold, HospitalInventory
 
 
 class HospitalSerializer(serializers.ModelSerializer):
@@ -116,3 +116,9 @@ class RequestMonitorSerializer(serializers.ModelSerializer):
 class RecordHospitalDonationSerializer(serializers.Serializer):
     blood_request = serializers.IntegerField()
     donor = serializers.IntegerField()
+    
+class HospitalInventorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HospitalInventory
+        fields = ["id", "blood_type", "units_available", "updated_at"]
+        read_only_fields = fields

@@ -34,6 +34,7 @@ from .serializers import (
     RequestMonitorSerializer,    
     MyHospitalSerializer,
     RecordHospitalDonationSerializer,
+    HospitalInventorySerializer,
 )
 
 
@@ -354,3 +355,18 @@ class RecordHospitalDonationView(APIView):
             },
             status=http_status.HTTP_201_CREATED,
         )
+        
+class MyHospitalInventoryView(generics.ListAPIView):
+    """The blood stock held by the logged-in staff member's own hospital."""
+
+    serializer_class = HospitalInventorySerializer
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
+    pagination_class = None
+
+    def get_queryset(self):
+        hospital = self.request.user.staff_profile.hospital
+        if hospital is None:
+            raise NotFound(
+                "Your account is not linked to a hospital yet. Ask a KNBTS administrator to link it."
+            )
+        return HospitalInventory.objects.filter(hospital=hospital).order_by("blood_type")

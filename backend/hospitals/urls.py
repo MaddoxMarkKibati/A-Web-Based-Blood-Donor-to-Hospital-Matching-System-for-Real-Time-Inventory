@@ -16,7 +16,8 @@ from .views import (
     RequestMonitorView,
     RecentDonationsView,
     MyHospitalView,
-    RecordHospitalDonationView
+    RecordHospitalDonationView,
+    MyHospitalInventoryView
 )
 
 urlpatterns = [
@@ -36,4 +37,5 @@ urlpatterns = [
     path("monitor/donations/", RecentDonationsView.as_view(), name="monitor-donations"),
     path("my-hospital/", MyHospitalView.as_view(), name="my-hospital"),
     path("hospital-donations/", RecordHospitalDonationView.as_view(), name="hospital-donation-record"),
+    path("my-hospital/inventory/", MyHospitalInventoryView.as_view(), name="my-hospital-inventory"),
 ]
