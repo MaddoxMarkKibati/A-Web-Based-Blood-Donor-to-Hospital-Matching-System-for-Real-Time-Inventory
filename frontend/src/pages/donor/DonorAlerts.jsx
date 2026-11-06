@@ -4,6 +4,7 @@ import BloodTypeTag from "../../components/BloodTypeTag";
 import PushToggle from "../../components/PushToggle";
 import { fetchMyNotifications, respondToNotification } from "../../api/donors";
 import Skeleton from "../../components/Skeleton";
+import { Navigation } from "lucide-react";
 
 function isOpen(alert) {
   return alert.status === "pending" && (!alert.request_status || alert.request_status === "pending");
@@ -20,10 +21,16 @@ function whenText(iso) {
   return new Date(iso).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" });
 }
 
+function directionsUrl(destination) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${destination.lat},${destination.lng}&travelmode=driving`;
+}
+
 function AlertCard({ alert, busy, onRespond }) {
   const open = isOpen(alert);
   const critical = alert.urgency_level === "critical";
   const hasRequest = Boolean(alert.blood_type);
+  const showDirections =
+    alert.status === "accepted" && alert.request_status === "pending" && alert.destination;
 
   return (
     <article className={`alert-card ${critical && open ? "is-critical" : ""}`}>
@@ -59,7 +66,25 @@ function AlertCard({ alert, busy, onRespond }) {
           </button>
         </div>
       ) : (
-        <p className="alert-card-note">{closedNote(alert)}</p>
+        <>
+          <p className="alert-card-note">{closedNote(alert)}</p>
+          {showDirections && (
+            <p className="alert-card-directions">
+              <a
+                className="directions-link"
+                href={directionsUrl(alert.destination)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Navigation size={16} aria-hidden="true" />
+                Get directions
+              </a>
+              <span>
+                {alert.destination.name}, {alert.destination.address}
+              </span>
+            </p>
+          )}
+        </>
       )}
     </article>
   );
