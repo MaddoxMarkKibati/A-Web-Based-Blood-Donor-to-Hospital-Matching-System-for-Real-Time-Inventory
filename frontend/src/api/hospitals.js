@@ -76,3 +76,7 @@ export async function recordHospitalDonation(data) {
     body: JSON.stringify(data),
   });
 }
+
+export async function fetchMyHospitalInventory() {
+  return apiFetch("/hospitals/my-hospital/inventory/");
+}

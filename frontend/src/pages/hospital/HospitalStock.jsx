@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import OwnStock from "../../components/OwnStock";
 import StockOverview from "../../components/StockOverview";
+import Skeleton from "../../components/Skeleton";
 import {
   fetchRegionalStorageCenters,
   fetchInventory,
   fetchReserveThresholds,
 } from "../../api/hospitals";
-import Skeleton from "../../components/Skeleton";
 
 export default function HospitalStock() {
   const [centers, setCenters] = useState([]);
@@ -27,9 +28,12 @@ export default function HospitalStock() {
   return (
     <div className="page">
       <h1>Stock</h1>
-      <p>
-        These figures show national blood stock held by KNBTS across all regional
-        centres, not the stock of a single hospital. Reserve minimums are set by KNBTS.
+
+      <OwnStock />
+
+      <p className="own-stock-bridge">
+        The figures below are national blood stock held by KNBTS across all regional centres,
+        not the stock of a single hospital. Reserve minimums are set by KNBTS.
       </p>
       {error && <p className="auth-error">{error}</p>}
       {loading && <Skeleton />}
