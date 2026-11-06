@@ -177,8 +177,14 @@ class NotificationSerializer(serializers.ModelSerializer):
 class RequestResponseSerializer(serializers.ModelSerializer):
     donor_name = serializers.CharField(source="donor.full_name", read_only=True)
     blood_type = serializers.CharField(source="donor.blood_type", read_only=True)
+    donated = serializers.SerializerMethodField()
 
     class Meta:
         model = Notification
-        fields = ["id", "donor_name", "blood_type", "status"]
+        fields = ["id", "donor", "donor_name", "blood_type", "status", "donated"]
         read_only_fields = fields
+
+    def get_donated(self, obj):
+        return Donation.objects.filter(
+            blood_request_id=obj.blood_request_id, donor_id=obj.donor_id
+        ).exists()
