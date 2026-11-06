@@ -106,13 +106,14 @@ class NotificationSerializer(serializers.ModelSerializer):
         default=None,
     )
     distance_km = serializers.SerializerMethodField()
+    destination = serializers.SerializerMethodField()
     
     class Meta:
         model = Notification
         fields = [
             "id", "donor", "blood_request", "date", "status", "message_type",
             "blood_type", "units_needed", "urgency_level", "request_status",
-            "regional_storage_center_name", "distance_km",
+            "regional_storage_center_name", "distance_km","destination"
         ]
         read_only_fields = ["id", "donor", "blood_request", "date", "message_type"]
     
@@ -131,6 +132,19 @@ class NotificationSerializer(serializers.ModelSerializer):
         if nearest is None:
             return None
         return round(nearest.distance.km, 1)
+    
+    def get_destination(self, obj):
+        request = obj.blood_request
+        staff = request.staff if request else None
+        hospital = staff.hospital if staff else None
+        if hospital is None or hospital.location is None:
+            return None
+        return {
+            "name": hospital.name,
+            "address": hospital.address,
+            "lat": hospital.location.y,
+            "lng": hospital.location.x,
+        }
     
     def validate_status(self, value):
         if value not in (Notification.Status.ACCEPTED, Notification.Status.DECLINED):
