@@ -16,6 +16,7 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminDonations from "./pages/admin/AdminDonations";
 import AdminSettings from "./pages/admin/AdminSettings";
+import HospitalProfile from "./pages/hospital/HospitalProfile";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -121,6 +122,14 @@ function App() {
             element={
               <RequireRole role="hospital_staff">
                 <HospitalCorrections />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/hospital/profile"
+            element={
+              <RequireRole role="hospital_staff">
+                <HospitalProfile />
               </RequireRole>
             }
           />

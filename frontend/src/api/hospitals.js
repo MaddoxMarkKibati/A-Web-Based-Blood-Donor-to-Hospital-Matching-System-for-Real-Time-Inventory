@@ -58,3 +58,14 @@ export async function updateRequestStatus(id, status) {
 export async function fetchReserveThresholds() {
   return apiFetch("/hospitals/thresholds/");
 }
+
+export async function fetchMyHospital() {
+  return apiFetch("/hospitals/my-hospital/");
+}
+
+export async function updateMyHospital(data) {
+  return apiFetch("/hospitals/my-hospital/", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

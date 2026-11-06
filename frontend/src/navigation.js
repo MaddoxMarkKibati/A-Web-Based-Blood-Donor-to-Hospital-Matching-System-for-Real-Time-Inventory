@@ -10,6 +10,7 @@ import {
   Pencil,
   LayoutDashboard,
   Settings,
+  Building2
 } from "lucide-react";
 
 // Where each role lands after signing in.
@@ -38,6 +39,7 @@ export const NAV = {
     { to: "/hospital", label: "Requests", icon: ClipboardList, end: true },
     { to: "/hospital/stock", label: "Stock", icon: Droplets, end: true },
     { to: "/hospital/corrections", label: "Blood type corrections", icon: Pencil, end: true },
+    { to: "/hospital/profile", label: "Hospital", icon: Building2, end: true },
   ],
   knbts_admin: [
     { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
