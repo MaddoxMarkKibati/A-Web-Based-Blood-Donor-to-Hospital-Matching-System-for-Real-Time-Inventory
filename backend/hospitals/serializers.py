@@ -5,9 +5,22 @@ from .models import Hospital, RegionalStorageCenter, BloodInventory, BloodReques
 
 
 class HospitalSerializer(serializers.ModelSerializer):
+    location = GeometryField(required=False, allow_null=True)
+
     class Meta:
         model = Hospital
-        fields = ["id", "name", "address", "contact_info"]
+        fields = ["id", "name", "address", "contact_info", "location"]
+
+
+class MyHospitalSerializer(serializers.ModelSerializer):
+    """What hospital staff see and may change for their own hospital: only the location."""
+
+    location = GeometryField(required=False, allow_null=True)
+
+    class Meta:
+        model = Hospital
+        fields = ["id", "name", "address", "contact_info", "location"]
+        read_only_fields = ["id", "name", "address", "contact_info"]
 
 
 class RegionalStorageCenterSerializer(serializers.ModelSerializer):

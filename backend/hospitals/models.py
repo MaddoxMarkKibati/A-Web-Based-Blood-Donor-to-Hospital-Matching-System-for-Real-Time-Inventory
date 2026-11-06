@@ -5,6 +5,7 @@ class Hospital(models.Model):
     name = models.CharField(max_length=150)
     address = models.CharField(max_length=255)
     contact_info = models.CharField(max_length=100, blank=True)
+    location = models.PointField(geography=True, srid=4326, null=True, blank=True)
 
     class Meta:
         ordering = ["name"]

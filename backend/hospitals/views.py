@@ -4,6 +4,7 @@ from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.contrib.gis.db.models.functions import Distance
 from rest_framework import filters, generics, permissions
 from rest_framework.generics import get_object_or_404
+from rest_framework.exceptions import NotFound
 from .alerts import expire_stale_alerts, top_up_alerts
 import logging
 logger = logging.getLogger(__name__)
@@ -28,7 +29,8 @@ from .serializers import (
     HospitalSerializer,
     RegionalStorageCenterSerializer,
     ReserveThresholdSerializer,
-    RequestMonitorSerializer,
+    RequestMonitorSerializer,    
+    MyHospitalSerializer,
 )
 
 
@@ -255,3 +257,17 @@ class RecentDonationsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Donation.objects.select_related("donor", "regional_storage_center")[:20]
+    
+class MyHospitalView(generics.RetrieveUpdateAPIView):
+    """The logged-in staff member's hospital. Staff can read it and set its location."""
+
+    serializer_class = MyHospitalSerializer
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
+
+    def get_object(self):
+        hospital = self.request.user.staff_profile.hospital
+        if hospital is None:
+            raise NotFound(
+                "Your account is not linked to a hospital yet. Ask a KNBTS administrator to link it."
+            )
+        return hospital
