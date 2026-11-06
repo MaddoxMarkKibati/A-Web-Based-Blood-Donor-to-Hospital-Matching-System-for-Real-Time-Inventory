@@ -1,11 +1,13 @@
 from django.db import transaction
 from django.utils import timezone
-from django.db.models import Case, Count, IntegerField, Q, Value, When
+from django.db.models import Case, Count, IntegerField, Q, Value, When, Sum
 from django.contrib.gis.db.models.functions import Distance
-from rest_framework import filters, generics, permissions
+from rest_framework import filters, generics, permissions, status as http_status
 from rest_framework.generics import get_object_or_404
 from rest_framework.exceptions import NotFound
 from .alerts import expire_stale_alerts, top_up_alerts
+from rest_framework.response import Response
+from rest_framework.views import APIView
 import logging
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,7 @@ from donors.serializers import (
     RequestResponseSerializer,
 )
 
-from .models import BloodInventory, BloodRequest, Hospital, RegionalStorageCenter, ReserveThreshold
+from .models import BloodInventory, BloodRequest, Hospital, RegionalStorageCenter, ReserveThreshold, HospitalInventory
 from .serializers import (
     BloodInventorySerializer,
     BloodRequestSerializer,
@@ -31,6 +33,7 @@ from .serializers import (
     ReserveThresholdSerializer,
     RequestMonitorSerializer,    
     MyHospitalSerializer,
+    RecordHospitalDonationSerializer,
 )
 
 
@@ -271,3 +274,83 @@ class MyHospitalView(generics.RetrieveUpdateAPIView):
                 "Your account is not linked to a hospital yet. Ask a KNBTS administrator to link it."
             )
         return hospital
+    
+class RecordHospitalDonationView(APIView):
+    """Hospital staff record a donation from a donor who accepted one of the hospital's
+    requests. Adds 1 unit to the hospital's own stock and fulfils the request when
+    enough units have been recorded."""
+
+    permission_classes = [permissions.IsAuthenticated, IsHospitalStaff]
+
+    @transaction.atomic
+    def post(self, request):
+        input_serializer = RecordHospitalDonationSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+
+        hospital = request.user.staff_profile.hospital
+        if hospital is None:
+            return Response(
+                {"detail": "Your account is not linked to a hospital yet. Ask a KNBTS administrator to link it."},
+                status=http_status.HTTP_400_BAD_REQUEST,
+            )
+
+        blood_request = get_object_or_404(
+            BloodRequest.objects.select_for_update(of=("self",)),
+            pk=input_serializer.validated_data["blood_request"],
+            staff__hospital=hospital,
+        )
+        donor = get_object_or_404(Donor, pk=input_serializer.validated_data["donor"])
+
+        if blood_request.status != BloodRequest.Status.PENDING:
+            return Response(
+                {"detail": f"This request is already {blood_request.status}."},
+                status=http_status.HTTP_400_BAD_REQUEST,
+            )
+        accepted = Notification.objects.filter(
+            blood_request=blood_request, donor=donor, status=Notification.Status.ACCEPTED
+        ).exists()
+        if not accepted:
+            return Response(
+                {"detail": "This donor has not accepted this request."},
+                status=http_status.HTTP_400_BAD_REQUEST,
+            )
+        if Donation.objects.filter(blood_request=blood_request, donor=donor).exists():
+            return Response(
+                {"detail": "A donation from this donor is already recorded for this request."},
+                status=http_status.HTTP_400_BAD_REQUEST,
+            )
+
+        Donation.objects.create(
+            donor=donor,
+            hospital=hospital,
+            blood_request=blood_request,
+            blood_type=donor.blood_type,
+            units_donated=1,
+        )
+        donor.last_donation_date = timezone.now()
+        donor.save(update_fields=["last_donation_date"])
+
+        inventory, _ = HospitalInventory.objects.get_or_create(
+            hospital=hospital,
+            blood_type=donor.blood_type,
+            defaults={"units_available": 0},
+        )
+        inventory.units_available += 1
+        inventory.save(update_fields=["units_available", "updated_at"])
+
+        received = blood_request.donations.aggregate(total=Sum("units_donated"))["total"] or 0
+        if received >= blood_request.units_needed:
+            blood_request.status = BloodRequest.Status.FULFILLED
+            blood_request.save(update_fields=["status"])
+
+        return Response(
+            {
+                "donor_name": donor.full_name,
+                "blood_type": donor.blood_type,
+                "units_donated": 1,
+                "units_received": received,
+                "units_needed": blood_request.units_needed,
+                "request_status": blood_request.status,
+            },
+            status=http_status.HTTP_201_CREATED,
+        )

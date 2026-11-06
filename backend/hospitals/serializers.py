@@ -112,3 +112,7 @@ class RequestMonitorSerializer(serializers.ModelSerializer):
             "alerted", "accepted", "pending", "declined", "expired",
         ]
         read_only_fields = fields
+        
+class RecordHospitalDonationSerializer(serializers.Serializer):
+    blood_request = serializers.IntegerField()
+    donor = serializers.IntegerField()
