@@ -776,3 +776,33 @@ textarea:focus-visible,
   color: var(--color-text-muted);
   font-size: 0.75rem;
 }
+
+.live-panel { max-width: 40rem; margin-bottom: 1.5rem; }
+.live-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.live-panel-head h2 { margin: 0; }
+.live-status { font-weight: 600; }
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 1.7rem;
+  min-height: 0;
+  padding: 0;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+}
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  transition: transform 0.15s;
+}
+.switch[aria-checked="true"] { background: var(--color-primary); border-color: var(--color-primary); }
+.switch[aria-checked="true"] .switch-knob { transform: translateX(1.3rem); background: #ffffff; }
+@media (prefers-reduced-motion: reduce) { .switch-knob { transition: none; } }

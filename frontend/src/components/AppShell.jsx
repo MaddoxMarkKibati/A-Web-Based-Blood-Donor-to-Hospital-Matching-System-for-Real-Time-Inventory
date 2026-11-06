@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LiveLocationProvider from "../context/LiveLocationProvider";
 import ThemeToggle from "./ThemeToggle";
 import { NAV, ROLE_LABEL } from "../navigation";
 
@@ -7,7 +8,7 @@ export default function AppShell() {
   const { user, logout } = useAuth();
   const items = NAV[user.role] || [];
 
-  return (
+  const shell = (
     <div className="app-shell">
       <div className="shell-top">
         <span className="shell-brand">Blood donor matching</span>
@@ -40,4 +41,9 @@ export default function AppShell() {
       </main>
     </div>
   );
+
+  if (user.role === "donor") {
+    return <LiveLocationProvider userKey={user.email}>{shell}</LiveLocationProvider>;
+  }
+  return shell;
 }

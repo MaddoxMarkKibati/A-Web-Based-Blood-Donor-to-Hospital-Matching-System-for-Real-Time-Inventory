@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import LocationPicker from "../../components/LocationPicker";
 import { fetchMyLocations, createLocation, deleteLocation } from "../../api/donors";
 import Skeleton from "../../components/Skeleton";
+import LiveLocationPanel from "../../components/LiveLocationPanel";
 
 const MAX_FREQUENT = 2;
 const MAX_LIVE = 1;
@@ -88,7 +89,7 @@ export default function DonorLocations() {
         Hospitals find donors within 25 km of a blood centre using these places. Save up to
         two places you visit often, and one optional live location.
       </p>
-
+      <LiveLocationPanel />
       {error && <p className="auth-error">{error}</p>}
       {message && <p className="auth-success">{message}</p>}
 

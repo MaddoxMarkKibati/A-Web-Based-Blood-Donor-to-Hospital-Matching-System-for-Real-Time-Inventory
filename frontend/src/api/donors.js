@@ -63,3 +63,14 @@ export async function removePushSubscription(endpoint) {
     body: JSON.stringify({ endpoint }),
   });
 }
+
+export async function sendLiveLocation(lat, lng) {
+  return apiFetch("/donors/me/live-location/", {
+    method: "PUT",
+    body: JSON.stringify({ lat, lng }),
+  });
+}
+
+export async function stopLiveLocation() {
+  return apiFetch("/donors/me/live-location/", { method: "DELETE" });
+}
