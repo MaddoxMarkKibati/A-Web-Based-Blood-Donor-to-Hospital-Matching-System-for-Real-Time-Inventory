@@ -141,7 +141,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         if origin is None:
             return None
         nearest = (
-            obj.donor.locations.annotate(distance=Distance("point", origin))
+            obj.donor.locations.usable().annotate(distance=Distance("point", origin))
             .order_by("distance")
             .first()
         )
@@ -202,3 +202,7 @@ class RequestResponseSerializer(serializers.ModelSerializer):
         return Donation.objects.filter(
             blood_request_id=obj.blood_request_id, donor_id=obj.donor_id
         ).exists()
+        
+class LiveLocationSerializer(serializers.Serializer):
+    lat = serializers.FloatField(min_value=-90, max_value=90)
+    lng = serializers.FloatField(min_value=-180, max_value=180)

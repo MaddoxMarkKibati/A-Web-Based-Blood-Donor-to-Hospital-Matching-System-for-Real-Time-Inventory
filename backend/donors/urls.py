@@ -8,6 +8,7 @@ from .views import (
     MyLocationsListCreateView,
     MyLocationDetailView,
     PushSubscriptionView,
+    LiveLocationView,
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("me/locations/", MyLocationsListCreateView.as_view(), name="donor-locations"),
     path("me/locations/<int:pk>/", MyLocationDetailView.as_view(), name="donor-location-detail"),
     path("me/push-subscription/", PushSubscriptionView.as_view(), name="donor-push-subscription"),
+    path("me/live-location/", LiveLocationView.as_view(), name="donor-live-location"),
 ]

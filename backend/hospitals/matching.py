@@ -46,7 +46,7 @@ def ranked_candidates(blood_request, radius_km=RADIUS_KM):
     ).values_list("donor_id", flat=True)
 
     locations = (
-        DonorLocation.objects.filter(
+        DonorLocation.objects.usable().filter(
             donor__blood_type__in=donor_types,
             point__dwithin=(origin, D(km=radius_km)),
         )

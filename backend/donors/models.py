@@ -99,6 +99,15 @@ class Donor(models.Model):
     def __str__(self):
         return f"{self.full_name or self.user.email} ({self.blood_type or 'unset'})"
     
+class DonorLocationQuerySet(models.QuerySet):
+    def usable(self):
+        """Leave out live locations that have not been updated recently."""
+        cutoff = timezone.now() - timedelta(minutes=DonorLocation.LIVE_FRESH_MINUTES)
+        return self.exclude(
+            location_type=DonorLocation.LocationType.LIVE,
+            updated_at__lt=cutoff,
+        )
+
 class DonorLocation(models.Model):
     class LocationType(models.TextChoices):
         FREQUENT = "frequent", "Frequent"
@@ -106,6 +115,9 @@ class DonorLocation(models.Model):
 
     MAX_FREQUENT = 2
     MAX_LIVE = 1
+    LIVE_FRESH_MINUTES = 15
+
+    objects = DonorLocationQuerySet.as_manager()
 
     donor = models.ForeignKey(
         Donor,

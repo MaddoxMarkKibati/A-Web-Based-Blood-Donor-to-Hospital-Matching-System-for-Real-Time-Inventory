@@ -2,10 +2,10 @@ import logging
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.contrib.gis.geos import Point
 from accounts.permissions import IsDonor
-from .models import Donor, Donation, Notification, PushSubscription
-from .serializers import DonorSerializer, DonorLocationSerializer, DonationSerializer, NotificationSerializer
+from .models import Donor, Donation, Notification, PushSubscription, DonorLocation
+from .serializers import DonorSerializer, DonorLocationSerializer, DonationSerializer, NotificationSerializer, LiveLocationSerializer
 from hospitals.alerts import expire_stale_alerts, top_up_alerts
 
 logger = logging.getLogger(__name__)
@@ -122,5 +122,29 @@ class PushSubscriptionView(APIView):
             )
         PushSubscription.objects.filter(
             donor=request.user.donor_profile, endpoint=endpoint
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class LiveLocationView(APIView):
+    """PUT sets or refreshes the donor's live location. DELETE stops sharing and
+    removes it."""
+
+    permission_classes = [permissions.IsAuthenticated, IsDonor]
+
+    def put(self, request):
+        serializer = LiveLocationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        lat = serializer.validated_data["lat"]
+        lng = serializer.validated_data["lng"]
+        location, _ = DonorLocation.objects.update_or_create(
+            donor=request.user.donor_profile,
+            location_type=DonorLocation.LocationType.LIVE,
+            defaults={"label": "Live location", "point": Point(lng, lat, srid=4326)},
+        )
+        return Response({"lat": lat, "lng": lng, "updated_at": location.updated_at})
+
+    def delete(self, request):
+        request.user.donor_profile.locations.filter(
+            location_type=DonorLocation.LocationType.LIVE
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
