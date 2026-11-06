@@ -69,3 +69,10 @@ export async function updateMyHospital(data) {
     body: JSON.stringify(data),
   });
 }
+
+export async function recordHospitalDonation(data) {
+  return apiFetch("/hospitals/hospital-donations/", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import BloodTypeTag from "./BloodTypeTag";
-import { fetchRequestResponses, updateRequestStatus } from "../api/hospitals";
+import EmptyState from "./EmptyState";
 import Skeleton from "./Skeleton";
+import {
+  fetchRequestResponses,
+  updateRequestStatus,
+  recordHospitalDonation,
+} from "../api/hospitals";
 
 const STATUS_LABEL = {
   pending: "Pending",
@@ -21,7 +26,9 @@ export default function RequestCard({ request, centerName, onChanged }) {
   const [responses, setResponses] = useState(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [recordingId, setRecordingId] = useState(null);
   const [error, setError] = useState("");
+  const [note, setNote] = useState("");
 
   async function toggleResponders() {
     const next = !open;
@@ -55,6 +62,30 @@ export default function RequestCard({ request, centerName, onChanged }) {
     }
   }
 
+  async function handleRecord(responder) {
+    const name = responder.donor_name || "this donor";
+    if (!window.confirm(`Record 1 unit of blood from ${name}? This cannot be undone.`)) return;
+    setError("");
+    setNote("");
+    setRecordingId(responder.id);
+    try {
+      const result = await recordHospitalDonation({
+        blood_request: request.id,
+        donor: responder.donor,
+      });
+      setNote(
+        `Recorded 1 unit from ${result.donor_name}. ${result.units_received} of ${result.units_needed} units received.` +
+          (result.request_status === "fulfilled" ? " The request is now fulfilled." : "")
+      );
+      setResponses(await fetchRequestResponses(request.id));
+      if (onChanged) onChanged();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRecordingId(null);
+    }
+  }
+
   const alerted = request.alerted_count ?? 0;
   const accepted = request.accepted_count ?? 0;
   const created = request.created_at ? new Date(request.created_at).toLocaleString() : "";
@@ -85,6 +116,7 @@ export default function RequestCard({ request, centerName, onChanged }) {
       </p>
 
       {error && <p className="auth-error">{error}</p>}
+      {note && <p className="auth-success">{note}</p>}
 
       <div className="req-card-actions">
         <button type="button" onClick={toggleResponders} aria-expanded={open}>
@@ -105,14 +137,27 @@ export default function RequestCard({ request, centerName, onChanged }) {
       {open && (
         <div className="req-responders">
           {loading && <Skeleton lines={2} />}
-          {!loading && responses && responses.length === 0 && <p>No donors were alerted for this request.</p>}
+          {!loading && responses && responses.length === 0 && (
+            <EmptyState title="No donors alerted">No donors were alerted for this request.</EmptyState>
+          )}
           {!loading && responses && responses.length > 0 && (
             <ul>
               {responses.map((r) => (
                 <li key={r.id}>
                   <span>{r.donor_name || "Unnamed donor"}</span>
                   <BloodTypeTag type={r.blood_type} size="sm" />
-                  <span className={`resp-status resp-${r.status}`}>{RESPONSE_LABEL[r.status] ?? r.status}</span>
+                  <span className={`resp-status resp-${r.donated ? "accepted" : r.status}`}>
+                    {r.donated ? "Donated" : RESPONSE_LABEL[r.status] ?? r.status}
+                  </span>
+                  {request.status === "pending" && r.status === "accepted" && !r.donated && (
+                    <button
+                      type="button"
+                      disabled={recordingId === r.id}
+                      onClick={() => handleRecord(r)}
+                    >
+                      {recordingId === r.id ? "Recording..." : "Record donation"}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
