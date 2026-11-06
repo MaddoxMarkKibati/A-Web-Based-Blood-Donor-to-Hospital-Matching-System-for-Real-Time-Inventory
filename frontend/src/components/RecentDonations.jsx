@@ -46,7 +46,7 @@ export default function RecentDonations({ refreshKey }) {
                 <th>Donor</th>
                 <th>Blood type</th>
                 <th>Units</th>
-                <th>Centre</th>
+                <th>Recorded at</th>
                 <th>Recorded</th>
               </tr>
             </thead>
@@ -56,7 +56,12 @@ export default function RecentDonations({ refreshKey }) {
                   <td>{d.donor_name || "—"}</td>
                   <td>{d.blood_type}</td>
                   <td>{d.units_donated}</td>
-                  <td>{d.regional_storage_center_name}</td>
+                  <td>
+                    {d.place_name || "—"}
+                    <span className="place-type">
+                      {d.place_type === "hospital" ? "Hospital" : "Centre"}
+                    </span>
+                  </td>
                   <td>{formatWhen(d.donation_date)}</td>
                 </tr>
               ))}
